@@ -1,26 +1,56 @@
 @import "tailwindcss";
+@variant dark (&:where(.dark, .dark *));
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --visionary: #ff6b6b;
+  --depth-seeker: #00adb5;
+  --subtle-luxe: #b388ff;
+
+  /* Default accent */
+  --accent: var(--visionary);
+}
+
+[data-accent="visionary"] {
+  --accent: var(--visionary);
+}
+
+[data-accent="depth-seeker"] {
+  --accent: var(--depth-seeker);
+}
+
+[data-accent="subtle-luxe"] {
+  --accent: var(--subtle-luxe);
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --visionary: #e95454;
+  --depth-seeker: #0099a0;
+  --subtle-luxe: #9e74e5;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-visionary: var(--visionary);
+  --color-depth-seeker: var(--depth-seeker);
+  --color-subtle-luxe: var(--subtle-luxe);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-inter);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+}
+
+/* Hide default cursor on desktop, show custom cursor */
+@media (min-width: 768px) {
+  * {
+    cursor: none !important;
+  }
 }
