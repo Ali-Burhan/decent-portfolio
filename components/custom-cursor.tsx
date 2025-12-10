@@ -23,6 +23,23 @@ export function CustomCursor() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showCopyFeedback, setShowCopyFeedback] = useState(false);
   const [contextMenu, setContextMenu] = useState<ContextMenu>({ x: 0, y: 0, show: false });
+  const [cursorEnabled, setCursorEnabled] = useState(true);
+
+  // Listen for cursor toggle events
+  useEffect(() => {
+    const savedPreference = localStorage.getItem("customCursor");
+    const isEnabled = savedPreference === null ? true : savedPreference === "enabled";
+    setCursorEnabled(isEnabled);
+
+    const handleCursorToggle = (e: CustomEvent) => {
+      setCursorEnabled(e.detail.enabled);
+    };
+
+    window.addEventListener("cursorToggle", handleCursorToggle as EventListener);
+    return () => {
+      window.removeEventListener("cursorToggle", handleCursorToggle as EventListener);
+    };
+  }, []);
 
   useEffect(() => {
     let trailId = 0;
@@ -167,150 +184,153 @@ export function CustomCursor() {
 
   return (
     <>
-      <div className="pointer-events-none fixed inset-0 z-[150] hidden md:block">
-        {/* Click Ripples */}
-        <AnimatePresence>
-          {ripples.map((ripple) => (
+      {/* Cursor Visual Effects - Only render when enabled */}
+      {cursorEnabled && (
+        <div className="pointer-events-none fixed inset-0 z-[150] hidden md:block">
+          {/* Click Ripples */}
+          <AnimatePresence>
+            {ripples.map((ripple) => (
+              <motion.div
+                key={ripple.id}
+                className="absolute rounded-full border-2 border-accent"
+                initial={{
+                  x: ripple.x - 10,
+                  y: ripple.y - 10,
+                  width: 20,
+                  height: 20,
+                  opacity: 1,
+                }}
+                animate={{
+                  width: 80,
+                  height: 80,
+                  x: ripple.x - 40,
+                  y: ripple.y - 40,
+                  opacity: 0,
+                }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+              />
+            ))}
+          </AnimatePresence>
+
+          {/* Trail Particles - Optimized */}
+          {trails.map((trail) => (
             <motion.div
-              key={ripple.id}
-              className="absolute rounded-full border-2 border-accent"
+              key={trail.id}
+              className="absolute w-1 h-1 rounded-full bg-accent"
               initial={{
-                x: ripple.x - 10,
-                y: ripple.y - 10,
-                width: 20,
-                height: 20,
-                opacity: 1,
+                x: trail.x,
+                y: trail.y,
+                scale: 1,
+                opacity: 0.6,
               }}
               animate={{
-                width: 80,
-                height: 80,
-                x: ripple.x - 40,
-                y: ripple.y - 40,
+                scale: 0,
                 opacity: 0,
               }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
+              transition={{
+                duration: 0.5,
+                ease: "easeOut",
+              }}
+              style={{
+                left: 0,
+                top: 0,
+                willChange: "transform, opacity",
+              }}
             />
           ))}
-        </AnimatePresence>
 
-        {/* Trail Particles - Optimized */}
-        {trails.map((trail) => (
+          {/* Main Cursor Dot with Scroll Progress */}
           <motion.div
-            key={trail.id}
-            className="absolute w-1 h-1 rounded-full bg-accent"
-            initial={{
-              x: trail.x,
-              y: trail.y,
-              scale: 1,
-              opacity: 0.6,
-            }}
+            className="absolute rounded-full border-2 border-accent bg-accent/20 backdrop-blur-sm overflow-hidden"
             animate={{
-              scale: 0,
-              opacity: 0,
+              x: mousePosition.x - 12,
+              y: mousePosition.y - 12,
+              scale: isHovering ? 1.5 : 1,
+              backgroundColor: isHovering ? "var(--accent)" : "rgba(var(--accent-rgb), 0.2)",
             }}
             transition={{
-              duration: 0.5,
-              ease: "easeOut",
+              type: "spring",
+              stiffness: 500,
+              damping: 28,
+              mass: 0.5,
             }}
             style={{
-              left: 0,
-              top: 0,
-              willChange: "transform, opacity",
+              width: "24px",
+              height: "24px",
+              willChange: "transform",
             }}
-          />
-        ))}
+          >
+            {/* Scroll Progress Fill */}
+            <motion.div
+              className="absolute bottom-0 left-0 right-0 bg-accent/50"
+              style={{
+                height: `${scrollProgress}%`,
+              }}
+              transition={{ duration: 0.1 }}
+            />
+          </motion.div>
 
-        {/* Main Cursor Dot with Scroll Progress */}
-        <motion.div
-          className="absolute rounded-full border-2 border-accent bg-accent/20 backdrop-blur-sm overflow-hidden"
-          animate={{
-            x: mousePosition.x - 12,
-            y: mousePosition.y - 12,
-            scale: isHovering ? 1.5 : 1,
-            backgroundColor: isHovering ? "var(--accent)" : "rgba(var(--accent-rgb), 0.2)",
-          }}
-          transition={{
-            type: "spring",
-            stiffness: 500,
-            damping: 28,
-            mass: 0.5,
-          }}
-          style={{
-            width: "24px",
-            height: "24px",
-            willChange: "transform",
-          }}
-        >
-          {/* Scroll Progress Fill */}
+          {/* Outer Ring */}
           <motion.div
-            className="absolute bottom-0 left-0 right-0 bg-accent/50"
-            style={{
-              height: `${scrollProgress}%`,
+            className="absolute rounded-full border border-accent/40"
+            animate={{
+              x: mousePosition.x - 20,
+              y: mousePosition.y - 20,
+              scale: isHovering ? 1.3 : 1,
             }}
-            transition={{ duration: 0.1 }}
+            transition={{
+              type: "spring",
+              stiffness: 300,
+              damping: 20,
+              mass: 0.8,
+            }}
+            style={{
+              width: "40px",
+              height: "40px",
+              willChange: "transform",
+            }}
           />
-        </motion.div>
 
-        {/* Outer Ring */}
-        <motion.div
-          className="absolute rounded-full border border-accent/40"
-          animate={{
-            x: mousePosition.x - 20,
-            y: mousePosition.y - 20,
-            scale: isHovering ? 1.3 : 1,
-          }}
-          transition={{
-            type: "spring",
-            stiffness: 300,
-            damping: 20,
-            mass: 0.8,
-          }}
-          style={{
-            width: "40px",
-            height: "40px",
-            willChange: "transform",
-          }}
-        />
+          {/* Element Tooltip */}
+          <AnimatePresence>
+            {hoveredElement && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.2 }}
+                className="absolute text-xs font-semibold text-accent bg-background/90 backdrop-blur-sm px-3 py-1.5 rounded-full border border-accent/30 whitespace-nowrap"
+                style={{
+                  left: mousePosition.x + 20,
+                  top: mousePosition.y - 30,
+                }}
+              >
+                {hoveredElement}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-        {/* Element Tooltip */}
-        <AnimatePresence>
-          {hoveredElement && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.2 }}
-              className="absolute text-xs font-semibold text-accent bg-background/90 backdrop-blur-sm px-3 py-1.5 rounded-full border border-accent/30 whitespace-nowrap"
-              style={{
-                left: mousePosition.x + 20,
-                top: mousePosition.y - 30,
-              }}
-            >
-              {hoveredElement}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Copy Feedback */}
-        <AnimatePresence>
-          {showCopyFeedback && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.8, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="absolute text-sm font-bold text-green-500 bg-background/90 backdrop-blur-sm px-4 py-2 rounded-full border-2 border-green-500/50 shadow-lg"
-              style={{
-                left: mousePosition.x + 30,
-                top: mousePosition.y + 20,
-              }}
-            >
-              ✓ Copied!
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+          {/* Copy Feedback */}
+          <AnimatePresence>
+            {showCopyFeedback && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.8, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="absolute text-sm font-bold text-green-500 bg-background/90 backdrop-blur-sm px-4 py-2 rounded-full border-2 border-green-500/50 shadow-lg"
+                style={{
+                  left: mousePosition.x + 30,
+                  top: mousePosition.y + 20,
+                }}
+              >
+                ✓ Copied!
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
 
       {/* Custom Context Menu */}
       <AnimatePresence>

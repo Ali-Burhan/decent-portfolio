@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
 import { useTheme } from "next-themes";
 import { throttle } from "@/lib/utils";
+import { CursorToggle } from "@/components/cursor-toggle";
 
 const accents = [
   { name: "Visionary", value: "visionary", color: "#FF6B6B" },
@@ -311,6 +312,9 @@ export function Nav() {
                 </AnimatePresence>
               </div>
 
+              {/* Cursor Toggle */}
+              <CursorToggle />
+
               {/* Theme Toggle */}
               <motion.button
                 whileHover={{ scale: 1.05, rotate: 180 }}
@@ -445,20 +449,20 @@ export function Nav() {
 
                   {/* Mobile Controls */}
                   <div className="mt-auto space-y-4">
-                    <div className="flex gap-3">
+                    <div className="grid grid-cols-3 gap-3">
                       <button
                         onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-                        className="flex-1 flex items-center justify-center gap-2 p-3 rounded-xl bg-foreground/5 border border-foreground/10 text-foreground/80 hover:bg-foreground/10 transition-colors"
+                        className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-foreground/5 border border-foreground/10 text-foreground/80 hover:bg-foreground/10 transition-colors"
                       >
                         {theme === "light" ? (
                           <>
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-                            <span>Light Mode</span>
+                            <span className="text-xs">Light</span>
                           </>
                         ) : (
                           <>
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
-                            <span>Dark Mode</span>
+                            <span className="text-xs">Dark</span>
                           </>
                         )}
                       </button>
@@ -469,14 +473,19 @@ export function Nav() {
                           const nextIndex = (accents.findIndex(a => a.value === activeAccent) + 1) % accents.length;
                           handleAccentChange(accents[nextIndex].value);
                         }}
-                        className="flex-1 flex items-center justify-center gap-2 p-3 rounded-xl bg-foreground/5 border border-foreground/10 text-foreground/80 hover:bg-foreground/10 transition-colors"
+                        className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-foreground/5 border border-foreground/10 text-foreground/80 hover:bg-foreground/10 transition-colors"
                       >
                          <span
-                            className="h-3 w-3 rounded-full shadow-[0_0_10px_currentColor]"
+                            className="h-5 w-5 rounded-full shadow-[0_0_10px_currentColor]"
                             style={{ backgroundColor: accents.find(a => a.value === activeAccent)?.color, color: accents.find(a => a.value === activeAccent)?.color }}
                           />
-                        <span>Color</span>
+                        <span className="text-xs">Color</span>
                       </button>
+
+                      {/* Mobile Cursor Toggle */}
+                      <div className="flex items-center justify-center">
+                        <CursorToggle />
+                      </div>
                     </div>
 
                     <motion.a
