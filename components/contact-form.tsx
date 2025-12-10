@@ -97,17 +97,18 @@ export function ContactForm() {
             key={i}
             className="absolute w-1 h-1 bg-accent/30 rounded-full"
             initial={{
-              x: Math.random() * 100 + "%",
-              y: Math.random() * 100 + "%",
+              x: `${(i * 5) % 100}%`,
+              y: `${(i * 7) % 100}%`,
+              opacity: 0,
             }}
             animate={{
-              y: [null, Math.random() * -100 - 50],
+              y: [null, `${((i * 7) % 100) - 50}%`],
               opacity: [0, 1, 0],
             }}
             transition={{
-              duration: Math.random() * 3 + 2,
+              duration: 2 + (i % 3),
               repeat: Infinity,
-              delay: Math.random() * 2,
+              delay: i * 0.1,
             }}
           />
         ))}

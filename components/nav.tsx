@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
 import { useTheme } from "next-themes";
 import { throttle } from "@/lib/utils";
 
@@ -10,6 +10,112 @@ const accents = [
   { name: "Depth Seeker", value: "depth-seeker", color: "#00ADB5" },
   { name: "Subtle Luxe", value: "subtle-luxe", color: "#B388FF" },
 ];
+
+// NavLink component with magnetic hover effect
+function NavLink({ link, isActive, onClick }: { link: { name: string; href: string; id: string }; isActive: boolean; onClick: () => void }) {
+  const ref = useRef<HTMLAnchorElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
+  
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  
+  const springConfig = { stiffness: 150, damping: 15, mass: 0.1 };
+  const xSpring = useSpring(x, springConfig);
+  const ySpring = useSpring(y, springConfig);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!ref.current) return;
+    
+    const rect = ref.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    // Calculate distance from center
+    const distanceX = e.clientX - centerX;
+    const distanceY = e.clientY - centerY;
+    
+    // Apply magnetic effect (move toward cursor)
+    x.set(distanceX * 0.3);
+    y.set(distanceY * 0.3);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.a
+      ref={ref}
+      href={link.href}
+      onClick={(e) => {
+        e.preventDefault();
+        onClick();
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={handleMouseLeave}
+      className="relative px-4 py-2 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors duration-300 group"
+      style={{ x: xSpring, y: ySpring }}
+    >
+      {link.name}
+      
+      {/* Hover Background */}
+      <motion.span
+        className="absolute inset-0 bg-foreground/5 rounded-lg"
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: isHovered ? 1 : 0, scale: isHovered ? 1 : 0.8 }}
+        transition={{ duration: 0.2 }}
+      />
+      
+      {/* Active Indicator */}
+      {isActive && (
+        <>
+          <motion.span
+            layoutId="nav-active"
+            className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent"
+            transition={{ type: "spring", stiffness: 380, damping: 30 }}
+          />
+          
+          {/* Glow Effect */}
+          <motion.span
+            className="absolute inset-0 bg-accent/10 rounded-lg blur-sm"
+            animate={{
+              opacity: [0.3, 0.6, 0.3],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+          
+          {/* Floating Particles */}
+          {[...Array(3)].map((_, i) => (
+            <motion.span
+              key={i}
+              className="absolute w-1 h-1 bg-accent/50 rounded-full"
+              style={{
+                left: `${30 + i * 20}%`,
+                top: "50%",
+              }}
+              animate={{
+                y: [-10, -20, -10],
+                opacity: [0, 1, 0],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                delay: i * 0.3,
+              }}
+            />
+          ))}
+        </>
+      )}
+    </motion.a>
+  );
+}
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -50,6 +156,36 @@ export function Nav() {
     window.addEventListener("scroll", throttledScroll, { passive: true });
     return () => window.removeEventListener("scroll", throttledScroll);
   }, [setTheme]);
+
+  // Scroll Spy - Track active section
+  useEffect(() => {
+    const sections = links.map(link => document.querySelector(link.href));
+    
+    const observerOptions = {
+      root: null,
+      rootMargin: "-20% 0px -70% 0px", // Trigger when section is in middle of viewport
+      threshold: 0,
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          setActiveLink(id);
+        }
+      });
+    }, observerOptions);
+
+    sections.forEach((section) => {
+      if (section) observer.observe(section);
+    });
+
+    return () => {
+      sections.forEach((section) => {
+        if (section) observer.unobserve(section);
+      });
+    };
+  }, []);
 
   const handleAccentChange = (accent: string) => {
     setActiveAccent(accent);
@@ -101,31 +237,21 @@ export function Nav() {
             </motion.a>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-1">
-              {links.map((link) => (
-                <a
+            <div className="hidden md:flex items-center gap-1 relative">
+              {links.map((link, index) => (
+                <NavLink
                   key={link.id}
-                  href={link.href}
-                  onClick={() => setActiveLink(link.id)}
-                  className="relative px-4 py-2 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors duration-300 group"
-                >
-                  {link.name}
-                  
-                  {/* Hover Effect */}
-                  <motion.span
-                    className="absolute inset-0 bg-foreground/5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    layoutId="nav-hover"
-                  />
-                  
-                  {/* Active Indicator */}
-                  {activeLink === link.id && (
-                    <motion.span
-                      layoutId="nav-active"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent"
-                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                    />
-                  )}
-                </a>
+                  link={link}
+                  isActive={activeLink === link.id}
+                  onClick={() => {
+                    setActiveLink(link.id);
+                    // Smooth scroll to section
+                    const element = document.querySelector(link.href);
+                    if (element) {
+                      element.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                  }}
+                />
               ))}
             </div>
 
