@@ -7,6 +7,18 @@ const accents = [
   { name: "Visionary", value: "visionary", color: "#FF6B6B" },
   { name: "Depth Seeker", value: "depth-seeker", color: "#00ADB5" },
   { name: "Subtle Luxe", value: "subtle-luxe", color: "#B388FF" },
+  { name: "Ocean Breeze", value: "ocean-breeze", color: "#3B82F6" },
+  { name: "Sunset Glow", value: "sunset-glow", color: "#F97316" },
+  { name: "Forest Zen", value: "forest-zen", color: "#10B981" },
+  { name: "Royal Purple", value: "royal-purple", color: "#8B5CF6" },
+  { name: "Coral Dream", value: "coral-dream", color: "#FB7185" },
+  { name: "Midnight Sky", value: "midnight-sky", color: "#1E40AF" },
+  { name: "Cherry Blossom", value: "cherry-blossom", color: "#EC4899" },
+  { name: "Amber Glow", value: "amber-glow", color: "#F59E0B" },
+  { name: "Mint Fresh", value: "mint-fresh", color: "#14B8A6" },
+  { name: "Lavender Dream", value: "lavender-dream", color: "#A855F7" },
+  { name: "Crimson Fire", value: "crimson-fire", color: "#DC2626" },
+  { name: "Electric Cyan", value: "electric-cyan", color: "#06B6D4" },
 ];
 
 export function AccentSwitcher() {

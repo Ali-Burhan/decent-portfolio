@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { CustomCursor } from "@/components/custom-cursor";
+import { I18nProvider } from "@/lib/i18n";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -32,8 +33,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <CustomCursor />
-          {children}
+          <I18nProvider>
+            <CustomCursor />
+            {children}
+          </I18nProvider>
         </ThemeProvider>
       </body>
     </html>

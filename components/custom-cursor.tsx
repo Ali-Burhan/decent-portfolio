@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import portfolioData from "@/data/portfolio.json";
 
 interface Ripple {
   x: number;
@@ -42,23 +43,13 @@ export function CustomCursor() {
   }, []);
 
   useEffect(() => {
+    // IDs kept for potential future use; trail / ripple visuals are disabled for performance.
     let trailId = 0;
     let rippleId = 0;
     let lastTrailTime = 0;
 
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
-
-      // Throttle trail creation for better performance
-      const now = Date.now();
-      if (now - lastTrailTime > 50) { // Only create trail every 50ms
-        trailId++;
-        setTrails((prev) => [
-          ...prev.slice(-8), // Reduced from 15 to 8 for performance
-          { x: e.clientX, y: e.clientY, id: trailId },
-        ]);
-        lastTrailTime = now;
-      }
     };
 
     const handleMouseOver = (e: MouseEvent) => {
@@ -91,16 +82,6 @@ export function CustomCursor() {
     const handleClick = (e: MouseEvent) => {
       // Hide context menu on click
       setContextMenu({ x: 0, y: 0, show: false });
-
-      rippleId++;
-      setRipples((prev) => [
-        ...prev,
-        { x: e.clientX, y: e.clientY, id: rippleId },
-      ]);
-
-      setTimeout(() => {
-        setRipples((prev) => prev.filter((r) => r.id !== rippleId));
-      }, 800);
     };
 
     const handleContextMenu = (e: MouseEvent) => {
@@ -144,13 +125,12 @@ export function CustomCursor() {
     };
   }, []);
 
-  // Clean up old trails more aggressively
+  // Trail cleanup effect disabled; trails are no longer rendered for performance.
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTrails((prev) => prev.slice(-5));
-    }, 80);
-
-    return () => clearInterval(interval);
+    return () => {
+      setTrails([]);
+      setRipples([]);
+    };
   }, []);
 
   const handleMenuAction = (action: string) => {
@@ -160,6 +140,30 @@ export function CustomCursor() {
       case "home":
         window.scrollTo({ top: 0, behavior: "smooth" });
         break;
+      case "about": {
+        const el = document.querySelector("#about");
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        else window.location.href = "/about";
+        break;
+      }
+      case "experience": {
+        const el = document.querySelector("#experience");
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        else window.location.href = "/experience";
+        break;
+      }
+      case "projects": {
+        const el = document.querySelector("#projects");
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        else window.location.href = "/projects";
+        break;
+      }
+      case "contact": {
+        const el = document.querySelector("#contact");
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        else window.location.href = "/contact";
+        break;
+      }
       case "theme":
         // Toggle theme
         const html = document.documentElement;
@@ -171,10 +175,13 @@ export function CustomCursor() {
         setTimeout(() => setShowCopyFeedback(false), 2000);
         break;
       case "linkedin":
-        window.open("https://linkedin.com", "_blank");
+        window.open(portfolioData.socialLinks.linkedin, "_blank");
         break;
       case "github":
-        window.open("https://github.com", "_blank");
+        window.open(portfolioData.socialLinks.github, "_blank");
+        break;
+      case "twitter":
+        window.open(portfolioData.socialLinks.twitter, "_blank");
         break;
       case "reload":
         window.location.reload();
@@ -187,58 +194,7 @@ export function CustomCursor() {
       {/* Cursor Visual Effects - Only render when enabled */}
       {cursorEnabled && (
         <div className="pointer-events-none fixed inset-0 z-[150] hidden md:block">
-          {/* Click Ripples */}
-          <AnimatePresence>
-            {ripples.map((ripple) => (
-              <motion.div
-                key={ripple.id}
-                className="absolute rounded-full border-2 border-accent"
-                initial={{
-                  x: ripple.x - 10,
-                  y: ripple.y - 10,
-                  width: 20,
-                  height: 20,
-                  opacity: 1,
-                }}
-                animate={{
-                  width: 80,
-                  height: 80,
-                  x: ripple.x - 40,
-                  y: ripple.y - 40,
-                  opacity: 0,
-                }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-              />
-            ))}
-          </AnimatePresence>
-
-          {/* Trail Particles - Optimized */}
-          {trails.map((trail) => (
-            <motion.div
-              key={trail.id}
-              className="absolute w-1 h-1 rounded-full bg-accent"
-              initial={{
-                x: trail.x,
-                y: trail.y,
-                scale: 1,
-                opacity: 0.6,
-              }}
-              animate={{
-                scale: 0,
-                opacity: 0,
-              }}
-              transition={{
-                duration: 0.5,
-                ease: "easeOut",
-              }}
-              style={{
-                left: 0,
-                top: 0,
-                willChange: "transform, opacity",
-              }}
-            />
-          ))}
+          {/* Click ripples and trail particles removed for performance */}
 
           {/* Main Cursor Dot with Scroll Progress */}
           <motion.div
@@ -251,9 +207,9 @@ export function CustomCursor() {
             }}
             transition={{
               type: "spring",
-              stiffness: 500,
-              damping: 28,
-              mass: 0.5,
+              stiffness: 1200,
+              damping: 12,
+              mass: 0.2,
             }}
             style={{
               width: "24px",
@@ -281,9 +237,9 @@ export function CustomCursor() {
             }}
             transition={{
               type: "spring",
-              stiffness: 300,
-              damping: 20,
-              mass: 0.8,
+              stiffness: 900,
+              damping: 10,
+              mass: 0.25,
             }}
             style={{
               width: "40px",
@@ -340,65 +296,138 @@ export function CustomCursor() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="fixed z-[100] bg-background/95 backdrop-blur-xl border-2 border-accent/30 rounded-2xl shadow-2xl overflow-hidden"
+            className="fixed z-[100] bg-background/95 backdrop-blur-xl border border-accent/30 rounded-2xl shadow-2xl overflow-hidden"
             style={{
               left: contextMenu.x + 20, // Offset 20px right from cursor
               top: contextMenu.y + 10,  // Offset 10px down from cursor
-              minWidth: "220px",
+              minWidth: "260px",
             }}
           >
-            <div className="p-2">
-              <button
-                onClick={() => handleMenuAction("home")}
-                className="w-full text-left px-4 py-3 rounded-xl hover:bg-accent/10 transition-colors flex items-center gap-3 text-foreground"
-              >
-                <span className="text-xl">🏠</span>
-                <span className="font-medium">Back to Top</span>
-              </button>
-              
-              <button
-                onClick={() => handleMenuAction("theme")}
-                className="w-full text-left px-4 py-3 rounded-xl hover:bg-accent/10 transition-colors flex items-center gap-3 text-foreground"
-              >
-                <span className="text-xl">🌓</span>
-                <span className="font-medium">Toggle Theme</span>
-              </button>
+            <div className="p-3 space-y-3">
+              <div className="flex items-center justify-between text-xs font-mono text-foreground/50 px-2">
+                <span>Quick Command Palette</span>
+                <span className="text-accent">Right‑click</span>
+              </div>
 
-              <div className="h-px bg-accent/20 my-2" />
+              <div className="grid gap-2">
+                <div className="text-[11px] font-mono uppercase tracking-[0.16em] text-foreground/50 px-2">
+                  Navigation
+                </div>
+                <button
+                  onClick={() => handleMenuAction("home")}
+                  className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-accent/8 transition-colors flex items-center gap-3 text-foreground text-sm"
+                >
+                  <span className="text-base">🏠</span>
+                  <span className="flex flex-col">
+                    <span className="font-medium">Back to top</span>
+                    <span className="text-[11px] text-foreground/60">Scroll to hero section</span>
+                  </span>
+                </button>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => handleMenuAction("about")}
+                    className="text-left px-3 py-2 rounded-xl hover:bg-accent/8 transition-colors flex items-center gap-2 text-foreground text-xs"
+                  >
+                    <span className="text-base">👤</span>
+                    <span>About</span>
+                  </button>
+                  <button
+                    onClick={() => handleMenuAction("experience")}
+                    className="text-left px-3 py-2 rounded-xl hover:bg-accent/8 transition-colors flex items-center gap-2 text-foreground text-xs"
+                  >
+                    <span className="text-base">📂</span>
+                    <span>Experience</span>
+                  </button>
+                  <button
+                    onClick={() => handleMenuAction("projects")}
+                    className="text-left px-3 py-2 rounded-xl hover:bg-accent/8 transition-colors flex items-center gap-2 text-foreground text-xs"
+                  >
+                    <span className="text-base">🧩</span>
+                    <span>Projects</span>
+                  </button>
+                  <button
+                    onClick={() => handleMenuAction("contact")}
+                    className="text-left px-3 py-2 rounded-xl hover:bg-accent/8 transition-colors flex items-center gap-2 text-foreground text-xs"
+                  >
+                    <span className="text-base">✉️</span>
+                    <span>Contact</span>
+                  </button>
+                </div>
+              </div>
 
-              <button
-                onClick={() => handleMenuAction("copy-email")}
-                className="w-full text-left px-4 py-3 rounded-xl hover:bg-accent/10 transition-colors flex items-center gap-3 text-foreground"
-              >
-                <span className="text-xl">📧</span>
-                <span className="font-medium">Copy Email</span>
-              </button>
+              <div className="h-px bg-accent/15" />
 
-              <button
-                onClick={() => handleMenuAction("linkedin")}
-                className="w-full text-left px-4 py-3 rounded-xl hover:bg-accent/10 transition-colors flex items-center gap-3 text-foreground"
-              >
-                <span className="text-xl">💼</span>
-                <span className="font-medium">LinkedIn</span>
-              </button>
+              <div className="grid gap-2">
+                <div className="text-[11px] font-mono uppercase tracking-[0.16em] text-foreground/50 px-2">
+                  Quick actions
+                </div>
+                <button
+                  onClick={() => handleMenuAction("theme")}
+                  className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-accent/8 transition-colors flex items-center gap-3 text-foreground text-sm"
+                >
+                  <span className="text-base">🌓</span>
+                  <span className="flex flex-col">
+                    <span className="font-medium">Toggle theme</span>
+                    <span className="text-[11px] text-foreground/60">Switch between light & dark</span>
+                  </span>
+                </button>
+                <button
+                  onClick={() => handleMenuAction("copy-email")}
+                  className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-accent/8 transition-colors flex items-center gap-3 text-foreground text-sm"
+                >
+                  <span className="text-base">�</span>
+                  <span className="flex flex-col">
+                    <span className="font-medium">Copy email</span>
+                    <span className="text-[11px] text-foreground/60">aliburhan.dev.ai@gmail.com</span>
+                  </span>
+                </button>
+              </div>
 
-              <button
-                onClick={() => handleMenuAction("github")}
-                className="w-full text-left px-4 py-3 rounded-xl hover:bg-accent/10 transition-colors flex items-center gap-3 text-foreground"
-              >
-                <span className="text-xl">👨‍💻</span>
-                <span className="font-medium">GitHub</span>
-              </button>
+              <div className="h-px bg-accent/15" />
 
-              <div className="h-px bg-accent/20 my-2" />
+              <div className="grid gap-2">
+                <div className="text-[11px] font-mono uppercase tracking-[0.16em] text-foreground/50 px-2">
+                  Social
+                </div>
+                <div className="grid grid-cols-3 gap-2 text-xs">
+                  <button
+                    onClick={() => handleMenuAction("linkedin")}
+                    className="px-3 py-2 rounded-xl hover:bg-accent/8 transition-colors flex flex-col items-start gap-1 text-foreground"
+                  >
+                    <span className="text-base">💼</span>
+                    <span>LinkedIn</span>
+                  </button>
+                  <button
+                    onClick={() => handleMenuAction("github")}
+                    className="px-3 py-2 rounded-xl hover:bg-accent/8 transition-colors flex flex-col items-start gap-1 text-foreground"
+                  >
+                    <span className="text-base">👨‍💻</span>
+                    <span>GitHub</span>
+                  </button>
+                  <button
+                    onClick={() => handleMenuAction("twitter")}
+                    className="px-3 py-2 rounded-xl hover:bg-accent/8 transition-colors flex flex-col items-start gap-1 text-foreground"
+                  >
+                    <span className="text-base">�</span>
+                    <span>Twitter</span>
+                  </button>
+                </div>
+              </div>
 
-              <button
-                onClick={() => handleMenuAction("reload")}
-                className="w-full text-left px-4 py-3 rounded-xl hover:bg-accent/10 transition-colors flex items-center gap-3 text-foreground/70"
-              >
-                <span className="text-xl">🔄</span>
-                <span className="font-medium">Reload Page</span>
-              </button>
+              <div className="h-px bg-accent/15" />
+
+              <div className="flex items-center justify-between px-2 gap-2">
+                <button
+                  onClick={() => handleMenuAction("reload")}
+                  className="flex items-center gap-2 text-[11px] text-foreground/60 hover:text-accent transition-colors px-2 py-1 rounded-lg"
+                >
+                  <span className="text-base">🔄</span>
+                  <span>Reload page</span>
+                </button>
+                <span className="text-[10px] font-mono text-foreground/40">
+                  Built by Ali Burhan
+                </span>
+              </div>
             </div>
           </motion.div>
         )}

@@ -7,6 +7,18 @@
   --visionary: #ff6b6b;
   --depth-seeker: #00adb5;
   --subtle-luxe: #b388ff;
+  --ocean-breeze: #3b82f6;
+  --sunset-glow: #f97316;
+  --forest-zen: #10b981;
+  --royal-purple: #8b5cf6;
+  --coral-dream: #fb7185;
+  --midnight-sky: #1e40af;
+  --cherry-blossom: #ec4899;
+  --amber-glow: #f59e0b;
+  --mint-fresh: #14b8a6;
+  --lavender-dream: #a855f7;
+  --crimson-fire: #dc2626;
+  --electric-cyan: #06b6d4;
 
   /* Default accent */
   --accent: var(--visionary);
@@ -24,12 +36,72 @@
   --accent: var(--subtle-luxe);
 }
 
+[data-accent="ocean-breeze"] {
+  --accent: var(--ocean-breeze);
+}
+
+[data-accent="sunset-glow"] {
+  --accent: var(--sunset-glow);
+}
+
+[data-accent="forest-zen"] {
+  --accent: var(--forest-zen);
+}
+
+[data-accent="royal-purple"] {
+  --accent: var(--royal-purple);
+}
+
+[data-accent="coral-dream"] {
+  --accent: var(--coral-dream);
+}
+
+[data-accent="midnight-sky"] {
+  --accent: var(--midnight-sky);
+}
+
+[data-accent="cherry-blossom"] {
+  --accent: var(--cherry-blossom);
+}
+
+[data-accent="amber-glow"] {
+  --accent: var(--amber-glow);
+}
+
+[data-accent="mint-fresh"] {
+  --accent: var(--mint-fresh);
+}
+
+[data-accent="lavender-dream"] {
+  --accent: var(--lavender-dream);
+}
+
+[data-accent="crimson-fire"] {
+  --accent: var(--crimson-fire);
+}
+
+[data-accent="electric-cyan"] {
+  --accent: var(--electric-cyan);
+}
+
 .dark {
   --background: #0a0a0a;
   --foreground: #ededed;
   --visionary: #e95454;
   --depth-seeker: #0099a0;
   --subtle-luxe: #9e74e5;
+  --ocean-breeze: #60a5fa;
+  --sunset-glow: #fb923c;
+  --forest-zen: #34d399;
+  --royal-purple: #a78bfa;
+  --coral-dream: #fda4af;
+  --midnight-sky: #3b82f6;
+  --cherry-blossom: #f472b6;
+  --amber-glow: #fbbf24;
+  --mint-fresh: #2dd4bf;
+  --lavender-dream: #c084fc;
+  --crimson-fire: #ef4444;
+  --electric-cyan: #22d3ee;
 }
 
 @theme inline {
@@ -38,6 +110,18 @@
   --color-visionary: var(--visionary);
   --color-depth-seeker: var(--depth-seeker);
   --color-subtle-luxe: var(--subtle-luxe);
+  --color-ocean-breeze: var(--ocean-breeze);
+  --color-sunset-glow: var(--sunset-glow);
+  --color-forest-zen: var(--forest-zen);
+  --color-royal-purple: var(--royal-purple);
+  --color-coral-dream: var(--coral-dream);
+  --color-midnight-sky: var(--midnight-sky);
+  --color-cherry-blossom: var(--cherry-blossom);
+  --color-amber-glow: var(--amber-glow);
+  --color-mint-fresh: var(--mint-fresh);
+  --color-lavender-dream: var(--lavender-dream);
+  --color-crimson-fire: var(--crimson-fire);
+  --color-electric-cyan: var(--electric-cyan);
   --color-accent: var(--accent);
   --font-sans: var(--font-inter);
 }

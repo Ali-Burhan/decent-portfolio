@@ -5,11 +5,25 @@ import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motio
 import { useTheme } from "next-themes";
 import { throttle } from "@/lib/utils";
 import { CursorToggle } from "@/components/cursor-toggle";
+import { useI18n } from "@/lib/i18n";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 const accents = [
   { name: "Visionary", value: "visionary", color: "#FF6B6B" },
   { name: "Depth Seeker", value: "depth-seeker", color: "#00ADB5" },
   { name: "Subtle Luxe", value: "subtle-luxe", color: "#B388FF" },
+  { name: "Ocean Breeze", value: "ocean-breeze", color: "#3B82F6" },
+  { name: "Sunset Glow", value: "sunset-glow", color: "#F97316" },
+  { name: "Forest Zen", value: "forest-zen", color: "#10B981" },
+  { name: "Royal Purple", value: "royal-purple", color: "#8B5CF6" },
+  { name: "Coral Dream", value: "coral-dream", color: "#FB7185" },
+  { name: "Midnight Sky", value: "midnight-sky", color: "#1E40AF" },
+  { name: "Cherry Blossom", value: "cherry-blossom", color: "#EC4899" },
+  { name: "Amber Glow", value: "amber-glow", color: "#F59E0B" },
+  { name: "Mint Fresh", value: "mint-fresh", color: "#14B8A6" },
+  { name: "Lavender Dream", value: "lavender-dream", color: "#A855F7" },
+  { name: "Crimson Fire", value: "crimson-fire", color: "#DC2626" },
+  { name: "Electric Cyan", value: "electric-cyan", color: "#06B6D4" },
 ];
 
 // NavLink component with magnetic hover effect
@@ -123,6 +137,7 @@ export function Nav() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeLink, setActiveLink] = useState("home");
   const { theme, setTheme } = useTheme();
+  const { t } = useI18n();
   const [mounted, setMounted] = useState(false);
   const [accentDropdownOpen, setAccentDropdownOpen] = useState(false);
   const [activeAccent, setActiveAccent] = useState("visionary");
@@ -196,11 +211,11 @@ export function Nav() {
   };
 
   const links = [
-    { name: "Home", href: "#home", id: "home" },
-    { name: "About", href: "#about", id: "about" },
-    { name: "Experience", href: "#experience", id: "experience" },
-    { name: "Projects", href: "#projects", id: "projects" },
-    { name: "Contact", href: "#contact", id: "contact" },
+    { name: t("nav.home"), href: "#home", id: "home" },
+    { name: t("nav.about"), href: "#about", id: "about" },
+    { name: t("nav.experience"), href: "#experience", id: "experience" },
+    { name: t("nav.projects"), href: "#projects", id: "projects" },
+    { name: t("nav.contact"), href: "#contact", id: "contact" },
   ];
 
   if (!mounted) return null;
@@ -212,7 +227,7 @@ export function Nav() {
         animate={{ y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled
+          scrolled || mobileMenuOpen
             ? "bg-background/80 backdrop-blur-xl border-b border-foreground/10 shadow-lg shadow-accent/5"
             : "bg-transparent"
         }`}
@@ -221,7 +236,7 @@ export function Nav() {
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <motion.a
-              href="#home"
+              href="/"
               className="relative z-50 group"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -246,10 +261,16 @@ export function Nav() {
                   isActive={activeLink === link.id}
                   onClick={() => {
                     setActiveLink(link.id);
-                    // Smooth scroll to section
-                    const element = document.querySelector(link.href);
-                    if (element) {
-                      element.scrollIntoView({ behavior: "smooth", block: "start" });
+                    // Check if we're on the homepage
+                    if (window.location.pathname === '/') {
+                      // Smooth scroll to section on homepage
+                      const element = document.querySelector(link.href);
+                      if (element) {
+                        element.scrollIntoView({ behavior: "smooth", block: "start" });
+                      }
+                    } else {
+                      // Navigate to homepage with hash
+                      window.location.href = `/${link.href}`;
                     }
                   }}
                 />
@@ -312,6 +333,9 @@ export function Nav() {
                 </AnimatePresence>
               </div>
 
+              {/* Language Switcher */}
+              <LanguageSwitcher />
+
               {/* Cursor Toggle */}
               <CursorToggle />
 
@@ -334,17 +358,20 @@ export function Nav() {
                 )}
               </motion.button>
 
+
               {/* Resume/CTA Button */}
               <motion.a
-                href="#contact"
+                href="/resume.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="group relative px-6 py-2.5 bg-accent rounded-lg text-white font-semibold text-sm overflow-hidden"
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  Resume
+                  {t("nav.resume")}
                   <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </span>
                 <motion.div
@@ -412,9 +439,22 @@ export function Nav() {
                         initial={{ opacity: 0, x: 50 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
                           setActiveLink(link.id);
                           setMobileMenuOpen(false);
+                          
+                          // Check if we're on the homepage
+                          if (window.location.pathname === '/') {
+                            // Smooth scroll to section on homepage
+                            const element = document.querySelector(link.href);
+                            if (element) {
+                              element.scrollIntoView({ behavior: "smooth", block: "start" });
+                            }
+                          } else {
+                            // Navigate to homepage with hash
+                            window.location.href = `/${link.href}`;
+                          }
                         }}
                         className="group relative px-6 py-4 text-lg font-medium text-foreground/80 hover:text-foreground transition-colors duration-300 rounded-xl overflow-hidden"
                       >
@@ -492,7 +532,9 @@ export function Nav() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 }}
-                      href="#contact"
+                      href="/resume.pdf"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       onClick={() => setMobileMenuOpen(false)}
                       className="block w-full px-6 py-4 bg-accent rounded-xl text-white font-semibold text-center hover:shadow-lg hover:shadow-accent/50 transition-all duration-300"
                     >
