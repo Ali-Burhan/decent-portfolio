@@ -229,7 +229,7 @@ export function Nav() {
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrolled || mobileMenuOpen
             ? "bg-background/80 backdrop-blur-xl border-b border-foreground/10 shadow-lg shadow-accent/5"
-            : "bg-transparent"
+            : "md:bg-transparent bg-background/80 md:backdrop-blur-none backdrop-blur-xl md:border-b-0 border-b border-foreground/10"
         }`}
       >
         <nav className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
