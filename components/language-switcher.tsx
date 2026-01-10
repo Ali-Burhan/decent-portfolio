@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useI18n, Locale } from "@/lib/i18n";
 
@@ -11,8 +11,16 @@ const locales: { code: Locale; label: string }[] = [
 ];
 
 export function LanguageSwitcher() {
+  const [mounted, setMounted] = useState(false);
   const { locale, setLocale } = useI18n();
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Prevent hydration mismatch by not rendering until mounted
+  if (!mounted) return null;
 
   const current = locales.find((l) => l.code === locale) ?? locales[0];
 

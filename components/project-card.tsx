@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef, useState } from "react";
-import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
+import React from "react";
+import { motion } from "framer-motion";
 
 interface Project {
   name: string;
@@ -18,273 +18,126 @@ interface ProjectCardProps {
   index?: number;
 }
 
+// Generate a consistent gradient based on project name
+const getGradient = (name: string) => {
+  const gradients = [
+    "from-violet-500/20 via-purple-500/10 to-fuchsia-500/20",
+    "from-blue-500/20 via-cyan-500/10 to-teal-500/20",
+    "from-emerald-500/20 via-green-500/10 to-lime-500/20",
+    "from-orange-500/20 via-amber-500/10 to-yellow-500/20",
+    "from-rose-500/20 via-pink-500/10 to-red-500/20",
+    "from-indigo-500/20 via-blue-500/10 to-sky-500/20",
+  ];
+  const index = name.length % gradients.length;
+  return gradients[index];
+};
+
 export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
-  const cardRef = useRef<HTMLDivElement | null>(null);
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-
-  // Magnetic hover effect
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  
-  const springConfig = { stiffness: 150, damping: 15, mass: 0.1 };
-  const xSpring = useSpring(x, springConfig);
-  const ySpring = useSpring(y, springConfig);
-
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    const rect = cardRef.current?.getBoundingClientRect();
-    if (!rect) return;
-
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    
-    const offsetX = (event.clientX - centerX) * 0.15;
-    const offsetY = (event.clientY - centerY) * 0.15;
-
-    x.set(offsetX);
-    y.set(offsetY);
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    x.set(0);
-    y.set(0);
-  };
+  const gradient = getGradient(project.name);
 
   return (
-    <motion.div
-      ref={cardRef}
-      style={{ x: xSpring, y: ySpring }}
-      initial={{ opacity: 0, y: 30 }}
+    <motion.article
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "0px 0px -80px 0px" }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={handleMouseLeave}
-      onClick={() => setIsFlipped(!isFlipped)}
-      className="group relative h-[400px] cursor-pointer perspective-1000"
+      viewport={{ once: true, margin: "0px 0px -50px 0px" }}
+      transition={{ duration: 0.4, delay: index * 0.05 }}
+      className="group h-full"
     >
-      {/* Animated gradient border */}
-      <motion.div
-        className="absolute -inset-[1px] rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-        style={{
-          background: "linear-gradient(60deg, var(--accent), transparent, var(--accent))",
-          backgroundSize: "300% 300%",
-        }}
-        animate={{
-          backgroundPosition: isHovered ? ["0% 50%", "100% 50%", "0% 50%"] : "0% 50%",
-        }}
-        transition={{
-          duration: 3,
-          repeat: Infinity,
-          ease: "linear",
-        }}
-      />
-
-      {/* Card container with flip */}
-      <motion.div
-        className="relative h-full w-full"
-        animate={{ rotateY: isFlipped ? 180 : 0 }}
-        transition={{ duration: 0.6, type: "spring", stiffness: 100 }}
-        style={{ transformStyle: "preserve-3d" }}
-      >
-        {/* Front of card */}
-        <div
-          className="absolute inset-0 rounded-3xl bg-gradient-to-br from-foreground/[0.03] via-background/95 to-foreground/[0.05] backdrop-blur-2xl border border-foreground/10 p-7 overflow-hidden"
-          style={{ backfaceVisibility: "hidden" }}
-        >
-          {/* Particle effects */}
-          <AnimatePresence>
-            {isHovered && (
-              <>
-                {[...Array(8)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute w-1 h-1 rounded-full bg-accent/40"
-                    initial={{
-                      x: Math.random() * 100 + "%",
-                      y: "100%",
-                      opacity: 0,
-                    }}
-                    animate={{
-                      y: "-20%",
-                      opacity: [0, 1, 0],
-                    }}
-                    exit={{ opacity: 0 }}
-                    transition={{
-                      duration: 2 + Math.random() * 2,
-                      repeat: Infinity,
-                      delay: i * 0.2,
-                    }}
-                  />
-                ))}
-              </>
-            )}
-          </AnimatePresence>
-
-          {/* Radial gradient overlay */}
-          <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--accent)_0,_transparent_60%)] opacity-40" />
+      <div className="relative h-full rounded-xl border border-foreground/10 bg-background overflow-hidden transition-all duration-300 hover:border-accent/40 hover:shadow-lg hover:shadow-accent/5">
+        {/* Gradient Header */}
+        <div className={`h-24 bg-gradient-to-br ${gradient} relative overflow-hidden`}>
+          {/* Decorative Pattern */}
+          <div className="absolute inset-0 opacity-30">
+            <div className="absolute top-4 right-4 w-16 h-16 border border-white/20 rounded-lg rotate-12" />
+            <div className="absolute bottom-2 left-6 w-8 h-8 border border-white/20 rounded-full" />
+            <div className="absolute top-6 left-1/3 w-12 h-12 border border-white/10 rounded-lg -rotate-6" />
           </div>
 
-          {/* Content */}
-          <div className="relative z-10 h-full flex flex-col">
-            {/* Header */}
-            <div className="mb-4 flex items-start justify-between gap-4">
-              <div className="space-y-2">
-                {project.type && (
-                  <motion.span
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: index * 0.1 + 0.2 }}
-                    className="inline-flex items-center rounded-full bg-accent/10 border border-accent/20 px-3 py-1 text-xs font-mono uppercase tracking-[0.15em] text-accent"
-                  >
-                    {project.type}
-                  </motion.span>
-                )}
-                <h3 className="text-xl font-bold text-foreground group-hover:text-accent transition-colors">
-                  {project.name}
-                </h3>
-              </div>
-
-              <div className="flex items-center gap-2 text-foreground/60">
-                {project.repoUrl && (
-                  <motion.a
-                    href={project.repoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ scale: 1.2, rotate: 5 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={(e) => e.stopPropagation()}
-                    className="p-2 rounded-full hover:text-accent hover:bg-accent/10 transition-colors"
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
-                    </svg>
-                  </motion.a>
-                )}
-                {project.liveUrl && (
-                  <motion.a
-                    href={project.liveUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ scale: 1.2, rotate: -5 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={(e) => e.stopPropagation()}
-                    className="p-2 rounded-full hover:text-accent hover:bg-accent/10 transition-colors"
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3" />
-                    </svg>
-                  </motion.a>
-                )}
-              </div>
+          {/* Type Badge */}
+          {project.type && (
+            <div className="absolute top-4 left-4">
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-white/90 dark:bg-black/50 text-foreground/80 backdrop-blur-sm">
+                {project.type}
+              </span>
             </div>
+          )}
 
-            {/* Description */}
-            <p className="mb-4 text-sm text-foreground/70 leading-relaxed line-clamp-3">
-              {project.description}
-            </p>
-
-            {/* Technologies */}
-            <div className="mt-auto">
-              <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-foreground/40 mb-3">
-                Technologies
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {project.technologies.slice(0, 6).map((tech, i) => (
-                  <motion.span
-                    key={tech}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.1 + i * 0.05 }}
-                    whileHover={{ scale: 1.1, y: -2 }}
-                    className="rounded-full border border-foreground/10 bg-foreground/5 px-3 py-1 text-[11px] font-mono text-foreground/70 hover:border-accent/50 hover:text-accent transition-colors"
-                  >
-                    {tech}
-                  </motion.span>
-                ))}
-              </div>
-            </div>
-
-            {/* Click to flip hint */}
-            <motion.div
-              className="absolute bottom-4 right-4 flex items-center gap-2 text-[10px] font-mono text-accent/60"
-              animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <span>Click to flip</span>
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Back of card */}
-        <div
-          className="absolute inset-0 rounded-3xl bg-gradient-to-br from-accent/10 via-background/95 to-accent/5 backdrop-blur-2xl border border-accent/20 p-7 overflow-auto"
-          style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
-        >
-          <div className="relative z-10 h-full flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="text-lg font-bold text-accent">Key Achievements</h4>
-              <motion.button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsFlipped(false);
-                }}
-                whileHover={{ scale: 1.1, rotate: 90 }}
-                whileTap={{ scale: 0.9 }}
-                className="p-2 rounded-full bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
+          {/* Links */}
+          <div className="absolute top-4 right-4 flex gap-2">
+            {project.repoUrl && (
+              <a
+                href={project.repoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 rounded-full bg-white/90 dark:bg-black/50 backdrop-blur-sm flex items-center justify-center text-foreground/70 hover:text-accent hover:scale-110 transition-all"
+                aria-label="View source code"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
                 </svg>
-              </motion.button>
-            </div>
-
-            {project.achievements && project.achievements.length > 0 ? (
-              <ul className="space-y-3 text-sm text-foreground/80">
-                {project.achievements.map((achievement, i) => (
-                  <motion.li
-                    key={i}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    className="flex items-start gap-3"
-                  >
-                    <span className="mt-1 text-accent text-xs">✓</span>
-                    <span className="leading-relaxed">{achievement}</span>
-                  </motion.li>
-                ))}
-              </ul>
-            ) : (
-              <div className="flex-1 flex items-center justify-center">
-                <p className="text-foreground/50 text-sm">No detailed achievements available</p>
-              </div>
+              </a>
             )}
-
-            {/* All technologies on back */}
-            <div className="mt-auto pt-4 border-t border-accent/10">
-              <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-accent/60 mb-2">
-                Full Tech Stack
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {project.technologies.map((tech) => (
-                  <span
-                    key={tech}
-                    className="rounded-full bg-accent/10 border border-accent/20 px-2 py-0.5 text-[10px] font-mono text-accent"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </div>
+            {project.liveUrl && (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 rounded-full bg-white/90 dark:bg-black/50 backdrop-blur-sm flex items-center justify-center text-foreground/70 hover:text-accent hover:scale-110 transition-all"
+                aria-label="View live demo"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+            )}
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+
+        {/* Content */}
+        <div className="p-5">
+          {/* Project Name */}
+          <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-accent transition-colors line-clamp-1">
+            {project.name}
+          </h3>
+
+          {/* Description */}
+          <p className="text-sm text-foreground/60 leading-relaxed mb-4 line-clamp-2">
+            {project.description}
+          </p>
+
+          {/* Key Achievement */}
+          {project.achievements && project.achievements.length > 0 && (
+            <div className="flex items-start gap-2 mb-4 p-3 rounded-lg bg-accent/5 border border-accent/10">
+              <svg className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              <span className="text-xs text-foreground/70 line-clamp-2 leading-relaxed">
+                {project.achievements[0]}
+              </span>
+            </div>
+          )}
+
+          {/* Technologies */}
+          <div className="flex flex-wrap gap-1.5">
+            {project.technologies.slice(0, 4).map((tech) => (
+              <span
+                key={tech}
+                className="px-2 py-0.5 rounded text-[10px] font-medium bg-foreground/5 text-foreground/60 border border-foreground/5"
+              >
+                {tech}
+              </span>
+            ))}
+            {project.technologies.length > 4 && (
+              <span className="px-2 py-0.5 rounded text-[10px] font-medium text-foreground/40">
+                +{project.technologies.length - 4}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Hover Accent Line */}
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-accent via-accent/80 to-accent/60 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+      </div>
+    </motion.article>
   );
 }

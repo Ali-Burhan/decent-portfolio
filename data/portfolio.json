@@ -1,8 +1,8 @@
 {
   "personalInfo": {
     "name": "Ali Burhan",
-    "role": "Full Stack Developer",
-    "description": "Full Stack Developer with expertise across modern JavaScript ecosystems (Next.js, React, Node.js, MERN stack) and Python, specializing in cloud-native architectures and AI-powered applications. Proven track record deploying scalable microservices with AWS, building LLM-based workflows with LangChain, and delivering enterprise-grade solutions serving 1000+ sites in 60+ countries.",
+    "role": "Full Stack Architect | Next.js • Python • AWS • AI",
+    "description": "Full Stack Developer specializing in Next.js, React, Python, and AWS. I build scalable web applications and AI-powered solutions, from business marketplaces to enterprise safety platforms.",
     "availability": "Available for new projects",
     "location": "Lahore, Pakistan",
     "phone": "03001499488",
@@ -10,9 +10,8 @@
     "portfolio": "https://aliburhan.vercel.app"
   },
   "socialLinks": {
-    "github": "https://github.com",
-    "linkedin": "https://linkedin.com/in/aliburhan",
-    "twitter": "https://twitter.com",
+    "github": "https://github.com/Ali-Burhan",
+    "linkedin": "https://www.linkedin.com/in/ali-burhan-9076b42b6/",
     "portfolio": "https://aliburhan.vercel.app"
   },
   "skills": {
@@ -93,7 +92,7 @@
         {
           "name": "Lumaya",
           "duration": "Nov 2024 – Mar 2025",
-          "description": "Full-stack business selling platform",
+          "description": "Engineered a full-stack business marketplace platform processing $10M+ in listings, solving complex KYC verification and real-time communication challenges. Delivered solo in 4 months with 95% KYC success rate and zero-downtime deployment on AWS.",
           "achievements": [
             "Developed full-stack business selling platform (lumaya.ch) using Next.js and Python FastAPI, handling 50+ business listings worth $10M+ total value",
             "Built responsive frontend with TypeScript and integrated Veriff KYC API for identity verification, processing 100+ verifications with 95% success rate",
@@ -114,7 +113,7 @@
         {
           "name": "Forwood Safety (Workplace Safety Platform)",
           "duration": "Mar 2025 – Present",
-          "description": "Microservices-based safety management platform",
+          "description": "Architected and scaled microservices platform serving 1000+ workplace sites across 60+ countries, preventing fatalities through real-time safety monitoring. Built AI-powered ATS with LangChain and orchestrated zero-downtime quarterly releases as Release Manager.",
           "achievements": [
             "Contributing to microservices-based safety management platform deployed across 1000+ sites in 60+ countries, preventing workplace fatalities",
             "Developed and maintained backend services in Python using serverless architecture (AWS Lambda, API Gateway, CloudFront, SQS, Kinesis)",
@@ -149,7 +148,7 @@
         {
           "name": "CazVid (AI-Driven Job Platform)",
           "duration": "Nov 2024 – Mar 2025",
-          "description": "AI-driven job board platform serving 150+ languages globally",
+          "description": "Built AI-powered global job platform supporting 150+ languages with intelligent resume screening and real-time candidate scoring. Optimized performance by 40% through advanced code splitting while delivering complex Kanban recruiter dashboard with drag-and-drop workflows.",
           "achievements": [
             "Developed AI-driven job board platform serving 150+ languages globally, building complex frontend components in Next.js with Zustand state management",
             "Integrated 20+ RESTful APIs between Next.js frontend and NestJS/MongoDB backend, enabling real-time AI resume screening and candidate scoring",
@@ -172,7 +171,7 @@
   "freelanceProjects": [
     {
       "name": "TeachTrack AI",
-      "description": "AI-powered educational platform for schools",
+      "description": "Created AI-driven educational platform automating 500+ monthly assessments, slashing teacher workload by 70% through GPT-4 powered test generation. Implemented LangChain RAG to process 1,000+ curriculum pages, delivering instant grading and personalized feedback at scale.",
       "achievements": [
         "Developed AI-powered educational platform for schools, automating test creation and grading for 500+ assessments monthly",
         "Built intelligent test generator using GPT-4 and prompt engineering, creating customized assessments based on curriculum requirements and difficulty levels",
@@ -206,11 +205,9 @@
     }
   ],
   "highlights": {
-    "totalProjects": 4,
-    "sitesDeployed": "1000+",
-    "countriesServed": "60+",
-    "assessmentsAutomated": "500+",
-    "performanceImprovement": "40%",
-    "teacherWorkloadReduction": "70%"
+    "yearsExperience": "2+",
+    "projectsCompleted": "10+",
+    "technologies": "30+",
+    "clients": "5+"
   }
 }

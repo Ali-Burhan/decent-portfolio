@@ -17,6 +17,7 @@ const messages: AllMessages = {
     "nav.contact": "Contact",
     "nav.resume": "Resume",
     "nav.downloadResume": "Download Resume",
+    "nav.searchPlaceholder": "Search skills, projects, experience...",
 
     "hero.greetingPrefix": "Hi, I'm",
     "hero.viewMyWork": "View My Work",
@@ -51,6 +52,7 @@ const messages: AllMessages = {
     "nav.contact": "Contacto",
     "nav.resume": "Currículum",
     "nav.downloadResume": "Descargar currículum",
+    "nav.searchPlaceholder": "Buscar habilidades, proyectos, experiencia...",
 
     "hero.greetingPrefix": "Hola, soy",
     "hero.viewMyWork": "Ver mi trabajo",
@@ -85,6 +87,7 @@ const messages: AllMessages = {
     "nav.contact": "Contact",
     "nav.resume": "CV",
     "nav.downloadResume": "Télécharger le CV",
+    "nav.searchPlaceholder": "Rechercher des compétences, projets, expériences...",
 
     "hero.greetingPrefix": "Salut, je suis",
     "hero.viewMyWork": "Voir mon travail",

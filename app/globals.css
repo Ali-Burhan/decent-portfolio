@@ -84,9 +84,41 @@
   --accent: var(--electric-cyan);
 }
 
+/* OS Desktop specific variables */
+:root {
+  --os-taskbar: #ffffff;
+  --os-taskbar-border: rgba(0, 0, 0, 0.1);
+  --os-window: #ffffff;
+  --os-window-header: #f3f3f3;
+  --os-window-text: #171717;
+  --os-window-border: rgba(0, 0, 0, 0.1);
+  --os-icon-hover: rgba(0, 0, 0, 0.05);
+  --os-cyan: #66d9ed;
+  --os-desktop-bg: #e0f2fe;
+  --os-start-menu-bg: #ffffff;
+  --os-popover-bg: #ffffff;
+  --os-text-primary: #171717;
+  --os-text-secondary: #4a4a4a;
+  --os-window-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
 .dark {
   --background: #0a0a0a;
   --foreground: #ededed;
+  --os-taskbar: #141414;
+  --os-taskbar-border: rgba(255, 255, 255, 0.1);
+  --os-window: #1e1e1e;
+  --os-window-header: #2d2d2d;
+  --os-window-text: #ffffff;
+  --os-window-border: rgba(255, 255, 255, 0.1);
+  --os-icon-hover: rgba(255, 255, 255, 0.1);
+  --os-cyan: #66d9ed;
+  --os-desktop-bg: #0c1929;
+  --os-start-menu-bg: #1c1c1c;
+  --os-popover-bg: #1c1c1c;
+  --os-text-primary: #ffffff;
+  --os-text-secondary: #a1a1aa;
+  --os-window-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
   --visionary: #e95454;
   --depth-seeker: #0099a0;
   --subtle-luxe: #9e74e5;
@@ -123,6 +155,15 @@
   --color-crimson-fire: var(--crimson-fire);
   --color-electric-cyan: var(--electric-cyan);
   --color-accent: var(--accent);
+  --color-os-window: var(--os-window);
+  --color-os-window-header: var(--os-window-header);
+  --color-os-window-text: var(--os-window-text);
+  --color-os-desktop-bg: var(--os-desktop-bg);
+  --color-os-start-menu-bg: var(--os-start-menu-bg);
+  --color-os-popover-bg: var(--os-popover-bg);
+  --color-os-text-primary: var(--os-text-primary);
+  --color-os-text-secondary: var(--os-text-secondary);
+  --color-os-taskbar: var(--os-taskbar);
   --font-sans: var(--font-inter);
 }
 
@@ -132,9 +173,11 @@ body {
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
 }
 
-/* Hide default cursor on desktop, show custom cursor */
-@media (min-width: 768px) {
-  * {
-    cursor: none !important;
-  }
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
 import { useTheme } from "next-themes";
 import { throttle } from "@/lib/utils";
-import { CursorToggle } from "@/components/cursor-toggle";
+
 import { useI18n } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/language-switcher";
 
@@ -27,28 +28,28 @@ const accents = [
 ];
 
 // NavLink component with magnetic hover effect
-function NavLink({ link, isActive, onClick }: { link: { name: string; href: string; id: string }; isActive: boolean; onClick: () => void }) {
+function NavLink({ link, isActive, onClick }: { link: { name: string; href: string; sectionId: string }; isActive: boolean; onClick: () => void }) {
   const ref = useRef<HTMLAnchorElement>(null);
   const [isHovered, setIsHovered] = useState(false);
-  
+
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  
+
   const springConfig = { stiffness: 150, damping: 15, mass: 0.1 };
   const xSpring = useSpring(x, springConfig);
   const ySpring = useSpring(y, springConfig);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!ref.current) return;
-    
+
     const rect = ref.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
-    
+
     // Calculate distance from center
     const distanceX = e.clientX - centerX;
     const distanceY = e.clientY - centerY;
-    
+
     // Apply magnetic effect (move toward cursor)
     x.set(distanceX * 0.3);
     y.set(distanceY * 0.3);
@@ -135,12 +136,40 @@ function NavLink({ link, isActive, onClick }: { link: { name: string; href: stri
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeLink, setActiveLink] = useState("home");
+  const [scrollActiveSection, setScrollActiveSection] = useState<string | null>(null);
   const { theme, setTheme } = useTheme();
   const { t } = useI18n();
   const [mounted, setMounted] = useState(false);
   const [accentDropdownOpen, setAccentDropdownOpen] = useState(false);
   const [activeAccent, setActiveAccent] = useState("visionary");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
+
+  // Define links with page routes and section IDs
+  const links = [
+    { name: t("nav.home"), href: "/", sectionId: "home" },
+    { name: t("nav.about"), href: "/about", sectionId: "about" },
+    { name: t("nav.experience"), href: "/experience", sectionId: "experience" },
+    { name: t("nav.projects"), href: "/projects", sectionId: "projects" },
+    { name: t("nav.contact"), href: "/contact", sectionId: "contact" },
+  ];
+
+  // Determine active link based on pathname or scroll position (on homepage)
+  const getActiveLink = () => {
+    // On homepage, use scroll-based active section if available
+    if (pathname === "/" && scrollActiveSection) {
+      return scrollActiveSection;
+    }
+    // Otherwise, determine by pathname
+    if (pathname === "/") return "home";
+    // Match pathname to link (e.g., /about -> about)
+    const matchedLink = links.find((link) => link.href === pathname);
+    return matchedLink?.sectionId || "home";
+  };
+
+  const activeLink = getActiveLink();
 
   useEffect(() => {
     setMounted(true);
@@ -159,49 +188,71 @@ export function Nav() {
         setTheme(isDarkTime ? "dark" : "light");
       }
     };
-    
+
     checkTimeBasedTheme();
 
     // Throttled scroll handler for better performance
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
-    
+
     const throttledScroll = throttle(handleScroll, 100);
-    
+
     window.addEventListener("scroll", throttledScroll, { passive: true });
     return () => window.removeEventListener("scroll", throttledScroll);
   }, [setTheme]);
 
-  // Scroll Spy - Track active section
+  // Scroll Spy - Track active section (only on homepage)
   useEffect(() => {
-    const sections = links.map(link => document.querySelector(link.href));
-    
-    const observerOptions = {
-      root: null,
-      rootMargin: "-20% 0px -70% 0px", // Trigger when section is in middle of viewport
-      threshold: 0,
-    };
+    // Only enable scroll spy on the homepage
+    if (pathname !== "/") {
+      setScrollActiveSection(null);
+      return;
+    }
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const id = entry.target.id;
-          setActiveLink(id);
-        }
+    // Set default to "home" when entering the homepage
+    setScrollActiveSection("home");
+
+    // Small delay to let the page render before observing
+    const timeoutId = setTimeout(() => {
+      const sectionIds = links.map((link) => link.sectionId);
+      const sections = sectionIds.map((id) => document.getElementById(id));
+
+      const observerOptions = {
+        root: null,
+        rootMargin: "-20% 0px -70% 0px", // Trigger when section is in middle of viewport
+        threshold: 0,
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            setScrollActiveSection(id);
+          }
+        });
+      }, observerOptions);
+
+      sections.forEach((section) => {
+        if (section) observer.observe(section);
       });
-    }, observerOptions);
 
-    sections.forEach((section) => {
-      if (section) observer.observe(section);
-    });
+      // Store observer reference for cleanup
+      (window as any).__navObserver = observer;
+      (window as any).__navSections = sections;
+    }, 100);
 
     return () => {
-      sections.forEach((section) => {
-        if (section) observer.unobserve(section);
-      });
+      clearTimeout(timeoutId);
+      const observer = (window as any).__navObserver;
+      const sections = (window as any).__navSections;
+      if (observer && sections) {
+        sections.forEach((section: Element | null) => {
+          if (section) observer.unobserve(section);
+        });
+      }
     };
-  }, []);
+  }, [pathname]);
 
   const handleAccentChange = (accent: string) => {
     setActiveAccent(accent);
@@ -210,13 +261,42 @@ export function Nav() {
     setAccentDropdownOpen(false);
   };
 
-  const links = [
-    { name: t("nav.home"), href: "#home", id: "home" },
-    { name: t("nav.about"), href: "#about", id: "about" },
-    { name: t("nav.experience"), href: "#experience", id: "experience" },
-    { name: t("nav.projects"), href: "#projects", id: "projects" },
-    { name: t("nav.contact"), href: "#contact", id: "contact" },
-  ];
+  // Handle navigation - always navigate to the page
+  const handleNavClick = (link: { href: string; sectionId: string }) => {
+    // If clicking Home while already on homepage, scroll to top
+    if (link.href === "/" && pathname === "/") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setScrollActiveSection("home");
+      return;
+    }
+    // Navigate to the page
+    router.push(link.href);
+    // If navigating to home, scroll to top after navigation
+    if (link.href === "/") {
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }, 100);
+    }
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setShowSearchResults(query.length > 0);
+  };
+
+  const executeSearch = (windowId: string) => {
+    const event = new CustomEvent("open-os-window", {
+      detail: { windowId }
+    });
+    window.dispatchEvent(event);
+    setSearchQuery("");
+    setShowSearchResults(false);
+    
+    // If not on homepage, go home first since Desktop is there
+    if (pathname !== "/") {
+      router.push("/");
+    }
+  };
 
   if (!mounted) return null;
 
@@ -226,7 +306,7 @@ export function Nav() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${
           scrolled || mobileMenuOpen
             ? "bg-background/80 backdrop-blur-xl border-b border-foreground/10 shadow-lg shadow-accent/5"
             : "md:bg-transparent bg-background/80 md:backdrop-blur-none backdrop-blur-xl md:border-b-0 border-b border-foreground/10"
@@ -253,28 +333,87 @@ export function Nav() {
             </motion.a>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-1 relative">
-              {links.map((link, index) => (
-                <NavLink
-                  key={link.id}
-                  link={link}
-                  isActive={activeLink === link.id}
-                  onClick={() => {
-                    setActiveLink(link.id);
-                    // Check if we're on the homepage
-                    if (window.location.pathname === '/') {
-                      // Smooth scroll to section on homepage
-                      const element = document.querySelector(link.href);
-                      if (element) {
-                        element.scrollIntoView({ behavior: "smooth", block: "start" });
-                      }
-                    } else {
-                      // Navigate to homepage with hash
-                      window.location.href = `/${link.href}`;
-                    }
-                  }}
-                />
-              ))}
+            <div className="hidden md:flex items-center gap-6 relative px-6 py-2 bg-foreground/5 rounded-2xl border border-foreground/10 mx-4">
+              <div className="flex items-center gap-1">
+                {links.map((link) => (
+                  <NavLink
+                    key={link.sectionId}
+                    link={link}
+                    isActive={activeLink === link.sectionId}
+                    onClick={() => handleNavClick(link)}
+                  />
+                ))}
+              </div>
+              
+              <div className="w-px h-6 bg-foreground/10 mx-2" />
+              
+              {/* Navbar Search */}
+              <div className="relative group">
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-os-window rounded-xl border border-black/10 dark:border-white/10 focus-within:border-accent/30 transition-all w-48 lg:w-64">
+                  <svg className="w-4 h-4 text-foreground/40 group-focus-within:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    placeholder={t("nav.searchPlaceholder") || "Search portfolio..."}
+                    className="w-full bg-transparent border-none outline-none text-xs text-foreground placeholder:text-foreground/30"
+                  />
+                </div>
+                
+                {/* Search Results Dropdown */}
+                <AnimatePresence>
+                  {showSearchResults && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute top-full left-0 right-0 mt-2 bg-os-window border border-black/10 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden z-50 p-2"
+                    >
+                      {(() => {
+                        const query = searchQuery.toLowerCase();
+                        const results = [
+                          { id: "about", label: "About Me", icon: "👤", keywords: ["skills", "bio", "education", "tech", "react", "nextjs", "python"] },
+                          { id: "projects", label: "Projects", icon: "🚀", keywords: ["work", "apps", "code", "portfolio", "lumaya", "safety", "test"] },
+                          { id: "experience", label: "Experience", icon: "💼", keywords: ["jobs", "history", "hashlogics", "techling", "career"] },
+                          { id: "contact", label: "Contact", icon: "✉️", keywords: ["email", "hire", "talk", "social", "phone", "location"] },
+                        ];
+
+                        // Filter results by checking if query matches label, keywords or if we should open a specific window based on more data
+                        const filtered = results.filter(item => 
+                          item.label.toLowerCase().includes(query) ||
+                          item.keywords.some(k => k.includes(query))
+                        );
+
+                        if (filtered.length === 0) {
+                          return <p className="p-4 text-xs text-foreground/40 text-center">No matches found</p>;
+                        }
+
+                        return filtered.map(result => (
+                          <button
+                            key={result.id}
+                            onClick={() => executeSearch(result.id)}
+                            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent/10 text-foreground text-sm transition-colors group"
+                          >
+                            <span className="text-lg">{result.icon}</span>
+                            <div className="text-left">
+                              <p className="font-medium group-hover:text-accent transition-colors">{result.label}</p>
+                              <p className="text-[10px] text-foreground/40 italic">Open in OS Window</p>
+                            </div>
+                          </button>
+                        ));
+                      })()}
+                      
+                      {searchQuery.length > 0 && (
+                        <div className="p-2 border-t border-foreground/5 mt-1">
+                          <p className="text-[10px] text-foreground/30 text-center">Searching through portfolio.json...</p>
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
 
             {/* CTA Button & Theme Controls */}
@@ -285,7 +424,7 @@ export function Nav() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setAccentDropdownOpen(!accentDropdownOpen)}
-                  className="p-2 rounded-lg bg-foreground/5 backdrop-blur-sm border border-foreground/10 hover:bg-foreground/10 transition-all duration-300 text-foreground/70 hover:text-foreground"
+                  className="p-2 rounded-lg bg-os-window border border-black/10 dark:border-white/10 hover:bg-os-window-header transition-all duration-300 text-os-text-primary"
                   aria-label="Change accent color"
                 >
                   <div className="w-5 h-5 rounded-full border-2 border-current" style={{ backgroundColor: accents.find(a => a.value === activeAccent)?.color }}></div>
@@ -336,8 +475,7 @@ export function Nav() {
               {/* Language Switcher */}
               <LanguageSwitcher />
 
-              {/* Cursor Toggle */}
-              <CursorToggle />
+
 
               {/* Theme Toggle */}
               <motion.button
@@ -434,27 +572,15 @@ export function Nav() {
                   <div className="flex flex-col gap-2">
                     {links.map((link, index) => (
                       <motion.a
-                        key={link.id}
+                        key={link.sectionId}
                         href={link.href}
                         initial={{ opacity: 0, x: 50 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
                         onClick={(e) => {
                           e.preventDefault();
-                          setActiveLink(link.id);
                           setMobileMenuOpen(false);
-                          
-                          // Check if we're on the homepage
-                          if (window.location.pathname === '/') {
-                            // Smooth scroll to section on homepage
-                            const element = document.querySelector(link.href);
-                            if (element) {
-                              element.scrollIntoView({ behavior: "smooth", block: "start" });
-                            }
-                          } else {
-                            // Navigate to homepage with hash
-                            window.location.href = `/${link.href}`;
-                          }
+                          handleNavClick(link);
                         }}
                         className="group relative px-6 py-4 text-lg font-medium text-foreground/80 hover:text-foreground transition-colors duration-300 rounded-xl overflow-hidden"
                       >
@@ -477,7 +603,7 @@ export function Nav() {
                           whileHover={{ x: 0 }}
                           transition={{ duration: 0.3 }}
                         />
-                        {activeLink === link.id && (
+                        {activeLink === link.sectionId && (
                           <motion.div
                             layoutId="mobile-active"
                             className="absolute left-0 top-0 bottom-0 w-1 bg-accent"
@@ -522,10 +648,7 @@ export function Nav() {
                         <span className="text-xs">Color</span>
                       </button>
 
-                      {/* Mobile Cursor Toggle */}
-                      <div className="flex items-center justify-center">
-                        <CursorToggle />
-                      </div>
+
                     </div>
 
                     <motion.a
