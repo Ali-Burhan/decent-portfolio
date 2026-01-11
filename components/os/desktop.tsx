@@ -31,7 +31,7 @@ const QUICK_LINKS = [
 ];
 
 export function Desktop() {
-  const { personalInfo, socialLinks } = portfolioData;
+  const { personalInfo, socialLinks, highlights } = portfolioData;
   const [windows, setWindows] = useState<WindowState[]>([]);
   const [activeWindow, setActiveWindow] = useState<WindowId | null>(null);
   const [highestZ, setHighestZ] = useState(10);
@@ -315,14 +315,63 @@ export function Desktop() {
               {currentTime}
             </p>
 
+            {/* Impact Stats Grid */}
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="grid grid-cols-3 gap-3 md:gap-6 py-4 md:py-6"
+            >
+              {[
+                { label: "Experience", value: highlights.yearsExperience || "3+" },
+                { label: "Projects", value: highlights.projectsCompleted || "10+" },
+                { label: "Core Skills", value: "Full Stack" },
+              ].map((stat, i) => (
+                <div key={i} className="flex flex-col items-center">
+                  <span className="text-xl md:text-2xl font-black text-os-text-primary">{stat.value}</span>
+                  <span className="text-[10px] md:text-xs text-os-text-secondary uppercase tracking-widest font-bold opacity-60">{stat.label}</span>
+                </div>
+              ))}
+            </motion.div>
+
+            {/* Core Stack Pills */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="flex flex-wrap justify-center gap-2 max-w-md mx-auto"
+            >
+              {["Next.js", "Python", "AWS", "AI", "Terraform"].map((tech) => (
+                <span 
+                  key={tech}
+                  className="px-3 py-1 rounded-full bg-os-text-primary/5 border border-os-text-primary/10 text-[10px] md:text-xs font-bold text-os-text-secondary transition-all hover:bg-os-text-primary/10"
+                >
+                  {tech}
+                </span>
+              ))}
+            </motion.div>
+
+            {/* Status Badge */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.8 }}
+              className="pt-4"
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] md:text-xs font-bold uppercase tracking-widest shadow-sm">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                {personalInfo.availability}
+              </div>
+            </motion.div>
+
             {/* Hint */}
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
-              className="text-xs md:text-sm text-os-text-secondary opacity-60 mt-8 transition-colors"
+              transition={{ delay: 1.2 }}
+              className="text-[10px] md:text-xs text-os-text-secondary opacity-40 mt-8 transition-colors italic"
             >
-              Double-click an icon to explore
+              Explore my work via the taskbar or desktop icons
             </motion.p>
           </motion.div>
         </div>

@@ -33,11 +33,7 @@
       "RESTful APIs",
       "GraphQL"
     ],
-    "database": [
-      "MongoDB",
-      "PostgreSQL",
-      "SQL"
-    ],
+    "database": ["MongoDB", "PostgreSQL", "SQL"],
     "cloudDevOps": [
       "AWS Lambda",
       "AWS API Gateway",
@@ -73,14 +69,7 @@
       "JIRA",
       "Postman"
     ],
-    "languages": [
-      "JavaScript",
-      "TypeScript",
-      "Python",
-      "SQL",
-      "GraphQL",
-      "HCL"
-    ]
+    "languages": ["JavaScript", "TypeScript", "Python", "SQL", "GraphQL", "HCL"]
   },
   "experience": [
     {
@@ -205,7 +194,7 @@
     }
   ],
   "highlights": {
-    "yearsExperience": "2+",
+    "yearsExperience": "3+",
     "projectsCompleted": "10+",
     "technologies": "30+",
     "clients": "5+"
