@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import { motion } from "framer-motion";
 
 interface DesktopIconProps {
   icon: string;
@@ -20,17 +19,15 @@ export function DesktopIcon({ icon, label, onClick }: DesktopIconProps) {
     onClick();
   };
 
+  const baseClassName = "group flex flex-col items-center gap-1.5 p-2 rounded-md w-20 md:w-24 transition-all duration-75";
+  const selectedClass = "bg-foreground/15 ring-1 ring-os-cyan/50";
+  const hoverClass = "hover:bg-foreground/5 hover-scale-105 active-scale-95";
+
   return (
-    <motion.button
+    <button
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      className={`group flex flex-col items-center gap-1.5 p-2 rounded-md transition-all w-20 md:w-24 ${
-        isSelected
-          ? "bg-foreground/15 ring-1 ring-os-cyan/50"
-          : "hover:bg-foreground/5"
-      }`}
+      className={`${baseClassName} ${isSelected ? selectedClass : hoverClass}`}
     >
       {/* Icon Container - Windows 11 style with gradient */}
       <div className="relative w-12 h-12 md:w-14 md:h-14">
@@ -46,7 +43,7 @@ export function DesktopIcon({ icon, label, onClick }: DesktopIconProps) {
       >
         {label}
       </span>
-    </motion.button>
+    </button>
   );
 }
 

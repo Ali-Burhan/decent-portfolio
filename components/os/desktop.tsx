@@ -1,14 +1,16 @@
 "use client";
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Taskbar } from "./taskbar";
 import { DesktopIcon } from "./desktop-icon";
 import { Window } from "./window";
-import { AboutContent } from "./windows/about-content";
-import { ProjectsContent } from "./windows/projects-content";
-import { ExperienceContent } from "./windows/experience-content";
-import { ContactContent } from "./windows/contact-content";
 import portfolioData from "@/data/portfolio.json";
+
+// Lazy load window content for better performance
+const AboutContent = lazy(() => import("./windows/about-content").then(m => ({ default: m.AboutContent })));
+const ProjectsContent = lazy(() => import("./windows/projects-content").then(m => ({ default: m.ProjectsContent })));
+const ExperienceContent = lazy(() => import("./windows/experience-content").then(m => ({ default: m.ExperienceContent })));
+const ContactContent = lazy(() => import("./windows/contact-content").then(m => ({ default: m.ContactContent })));
 
 export type WindowId = "about" | "projects" | "experience" | "contact";
 
@@ -41,13 +43,25 @@ export function Desktop() {
   const [nightLight, setNightLight] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [currentTime, setCurrentTime] = useState("");
+  const [reduceMotion, setReduceMotion] = useState(false);
 
-  // Check for mobile
+  // Check for mobile and prefers-reduced-motion
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+
+    // Check for reduced motion preference
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduceMotion(mediaQuery.matches);
+
+    const handleMotionChange = (e: MediaQueryListEvent) => setReduceMotion(e.matches);
+    mediaQuery.addEventListener("change", handleMotionChange);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+      mediaQuery.removeEventListener("change", handleMotionChange);
+    };
   }, []);
 
   // Update time
@@ -124,13 +138,21 @@ export function Desktop() {
   }, []);
 
   const getWindowContent = (id: string) => {
-    switch (id) {
-      case "about": return <AboutContent />;
-      case "projects": return <ProjectsContent />;
-      case "experience": return <ExperienceContent />;
-      case "contact": return <ContactContent />;
-      default: return <div className="p-4">Content not found</div>;
-    }
+    const content = (() => {
+      switch (id) {
+        case "about": return <AboutContent />;
+        case "projects": return <ProjectsContent />;
+        case "experience": return <ExperienceContent />;
+        case "contact": return <ContactContent />;
+        default: return <div className="p-4">Content not found</div>;
+      }
+    })();
+
+    return (
+      <Suspense fallback={<WindowContentLoading />}>
+        {content}
+      </Suspense>
+    );
   };
 
   const getWindowTitle = (id: string) => {
@@ -216,39 +238,29 @@ export function Desktop() {
         filter: `brightness(${brightness}%) ${nightLight ? 'sepia(30%) saturate(120%) hue-rotate(-15deg)' : ''}`
       }}
     >
-      {/* Professional Mesh Gradient Background */}
+      {/* Professional Mesh Gradient Background - Optimized */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         {/* Base Layer */}
         <div className="absolute inset-0 bg-os-desktop-bg transition-colors duration-1000" />
-        
-        {/* Animated Blooms */}
+
+        {/* Optimized Animated Blooms - Reduced from 3 to 2, simplified animations */}
         <motion.div
-          animate={{
-            x: [0, 100, -50, 0],
-            y: [0, -50, 50, 0],
-            scale: [1, 1.2, 0.9, 1],
+          animate={reduceMotion ? {} : {
+            scale: [1, 1.15, 1],
           }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute -top-1/4 -left-1/4 w-full h-full rounded-full bg-[#38bdf8]/20 blur-[120px]"
+          transition={reduceMotion ? {} : { duration: 30, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -top-1/4 -left-1/4 w-full h-full rounded-full bg-[#38bdf8]/15 blur-[120px]"
+          style={{ willChange: reduceMotion ? 'auto' : 'transform' }}
         />
         <motion.div
-          animate={{
-            x: [0, -80, 60, 0],
-            y: [0, 100, -40, 0],
-            scale: [1, 1.1, 1.2, 1],
+          animate={reduceMotion ? {} : {
+            scale: [1, 1.1, 1],
           }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute -bottom-1/4 -right-1/4 w-full h-full rounded-full bg-[#818cf8]/15 blur-[100px]"
+          transition={reduceMotion ? {} : { duration: 35, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          className="absolute -bottom-1/4 -right-1/4 w-full h-full rounded-full bg-[#818cf8]/12 blur-[100px]"
+          style={{ willChange: reduceMotion ? 'auto' : 'transform' }}
         />
-        <motion.div
-          animate={{
-            x: [0, 40, -60, 0],
-            y: [0, 60, 100, 0],
-          }}
-          transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-          className="absolute top-1/4 right-1/4 w-1/2 h-1/2 rounded-full bg-[#c084fc]/10 blur-[80px]"
-        />
-        
+
         {/* Glass Overlay */}
         <div className="absolute inset-0 bg-background/5 backdrop-blur-[1px]" />
       </div>
@@ -289,7 +301,7 @@ export function Desktop() {
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.2, type: "spring" }}
+              transition={reduceMotion ? { duration: 0 } : { duration: 0.8, delay: 0.2, type: "spring" }}
               className="mx-auto w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-[#38bdf8] via-[#818cf8] to-[#c084fc] p-[2px] shadow-2xl shadow-indigo-500/20"
             >
               <div className="w-full h-full rounded-full bg-[#0f172a] flex items-center justify-center border-4 border-[#1e293b] overflow-hidden">
@@ -316,10 +328,10 @@ export function Desktop() {
             </p>
 
             {/* Impact Stats Grid */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
+              transition={reduceMotion ? { duration: 0 } : { delay: 0.4 }}
               className="grid grid-cols-3 gap-3 md:gap-6 py-4 md:py-6"
             >
               {[
@@ -335,10 +347,10 @@ export function Desktop() {
             </motion.div>
 
             {/* Core Stack Pills */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
+              transition={reduceMotion ? { duration: 0 } : { delay: 0.6 }}
               className="flex flex-wrap justify-center gap-2 max-w-md mx-auto"
             >
               {["Next.js", "Python", "AWS", "AI", "Terraform"].map((tech) => (
@@ -355,11 +367,11 @@ export function Desktop() {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.8 }}
+              transition={reduceMotion ? { duration: 0 } : { delay: 0.8 }}
               className="pt-4"
             >
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] md:text-xs font-bold uppercase tracking-widest shadow-sm">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className={`w-2 h-2 rounded-full bg-emerald-500 ${reduceMotion ? '' : 'animate-pulse'}`} />
                 {personalInfo.availability}
               </div>
             </motion.div>
@@ -368,7 +380,7 @@ export function Desktop() {
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 1.2 }}
+              transition={reduceMotion ? { duration: 0 } : { delay: 1.2 }}
               className="text-[10px] md:text-xs text-os-text-secondary opacity-40 mt-8 transition-colors italic"
             >
               Explore my work via the taskbar or desktop icons
@@ -624,4 +636,20 @@ function StartMenuIcon({ name }: { name: string }) {
   };
 
   return <>{icons[name] || icons.folder}</>;
+}
+
+// Loading fallback for lazy-loaded window content
+function WindowContentLoading() {
+  return (
+    <div className="flex items-center justify-center h-full min-h-[300px] p-8">
+      <div className="flex flex-col items-center gap-4">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full"
+        />
+        <p className="text-sm text-os-text-secondary">Loading...</p>
+      </div>
+    </div>
+  );
 }

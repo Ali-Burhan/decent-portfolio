@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThemeToggle } from "@/components/theme-toggle";
 import portfolioData from "@/data/portfolio.json";
@@ -28,11 +28,11 @@ interface TaskbarProps {
   setNightLight: (v: boolean) => void;
 }
 
-export function Taskbar({ 
-  openWindows, 
-  activeWindow, 
-  onWindowClick, 
-  onStartClick, 
+export const Taskbar = memo(function Taskbar({
+  openWindows,
+  activeWindow,
+  onWindowClick,
+  onStartClick,
   onShowDesktop,
   brightness,
   setBrightness,
@@ -152,13 +152,6 @@ export function Taskbar({
     return () => clearInterval(interval);
   }, []);
 
-  const windowLabels: Record<string, string> = {
-    about: "About",
-    projects: "Projects",
-    experience: "Experience",
-    contact: "Contact",
-  };
-
   return (
     <div className="fixed bottom-0 left-0 right-0 h-12 z-50">
       {/* Taskbar Background - Windows 11 style with blur */}
@@ -175,10 +168,10 @@ export function Taskbar({
         {/* Left Section - Widgets */}
         <div className="flex-1 flex items-center justify-start">
           <div className="flex items-center gap-1">
-            <button 
+            <button
               ref={widgetsButtonRef}
               onClick={() => { setShowWidgets(!showWidgets); }}
-              className={`w-10 h-10 rounded-md flex items-center justify-center transition-colors group ${showWidgets ? 'bg-foreground/15' : 'hover:bg-foreground/10'}`}
+              className={`w-10 h-10 rounded-md flex items-center justify-center transition-all duration-150 group ${showWidgets ? 'bg-foreground/15' : 'hover:bg-foreground/10 hover-scale-108 active-scale-92'}`}
               title="Widgets"
             >
               <svg className="w-5 h-5 text-os-text-primary opacity-70 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,11 +184,9 @@ export function Taskbar({
         {/* Center Section - Taskbar Icons */}
         <div className="flex-none flex items-center gap-1 px-2">
           {/* Start Button */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+          <button
             onClick={onStartClick}
-            className="w-10 h-10 rounded-md flex items-center justify-center hover:bg-foreground/10 transition-colors"
+            className="w-10 h-10 rounded-md flex items-center justify-center hover:bg-foreground/10 hover-scale-108 active-scale-92 transition-all duration-120"
             title="Start"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -210,12 +201,12 @@ export function Taskbar({
               <rect x="3" y="13" width="8" height="8" rx="1" fill="url(#windowsGrad)" />
               <rect x="13" y="13" width="8" height="8" rx="1" fill="url(#windowsGrad)" />
             </svg>
-          </motion.button>
+          </button>
 
           {/* Search Button - Desktop only */}
-          <button 
+          <button
             onClick={onStartClick}
-            className="hidden md:flex w-10 h-10 rounded-md items-center justify-center hover:bg-foreground/10 transition-colors group"
+            className="hidden md:flex w-10 h-10 rounded-md items-center justify-center hover:bg-foreground/10 hover-scale-108 active-scale-92 transition-all duration-120 group"
           >
             <svg className="w-5 h-5 text-os-text-primary opacity-70 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -229,23 +220,20 @@ export function Taskbar({
 
           {/* Open Windows */}
           {openWindows.map((windowId) => (
-            <motion.button
+            <button
               key={windowId}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
               onClick={() => onWindowClick(windowId)}
-              className={`relative w-10 h-10 rounded-md flex items-center justify-center transition-colors ${
+              className={`relative w-10 h-10 rounded-md flex items-center justify-center transition-all duration-120 ${
                 activeWindow === windowId
                   ? "bg-foreground/15"
-                  : "hover:bg-foreground/10"
+                  : "hover:bg-foreground/10 hover-scale-108 active-scale-92"
               }`}
-              title={windowLabels[windowId]}
+              title={WINDOW_LABELS[windowId]}
             >
               <TaskbarIcon name={windowId} />
               {/* Active indicator */}
               {activeWindow === windowId && (
-                <motion.div
-                  layoutId="activeIndicator"
+                <div
                   className="absolute bottom-1 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full bg-[#38bdf8]"
                 />
               )}
@@ -253,7 +241,7 @@ export function Taskbar({
               {activeWindow !== windowId && (
                 <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-0.5 rounded-full bg-foreground/30" />
               )}
-            </motion.button>
+            </button>
           ))}
         </div>
 
@@ -571,7 +559,7 @@ export function Taskbar({
       </AnimatePresence>
     </div>
   );
-}
+});
 
 function TaskbarIcon({ name }: { name: string }) {
   const iconClasses = "w-5 h-5";
@@ -663,3 +651,11 @@ function SystemIcon({ name }: { name: string }) {
 
   return icons[name] || null;
 }
+
+// Static window labels - outside component
+const WINDOW_LABELS: Record<string, string> = {
+  about: "About",
+  projects: "Projects",
+  experience: "Experience",
+  contact: "Contact",
+};

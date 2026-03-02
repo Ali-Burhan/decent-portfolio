@@ -30,18 +30,49 @@ export function ExperienceContent() {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {job.projects.map((project, pIndex) => (
                   <div key={pIndex} className="pl-3 border-l-2 border-[var(--os-cyan)]/30">
-                    <h4 className="text-sm font-medium text-foreground/90">{project.name}</h4>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="text-sm font-medium text-foreground/90">{project.name}</h4>
+                      {project.url && (
+                        <a
+                          href={project.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-[var(--os-cyan)] hover:underline"
+                          title="View Project"
+                        >
+                          🔗
+                        </a>
+                      )}
+                    </div>
+                    {project.duration && (
+                      <p className="text-xs text-foreground/50 mb-2">{project.duration}</p>
+                    )}
+                    {project.description && (
+                      <p className="text-xs text-foreground/70 mb-2 italic">{project.description}</p>
+                    )}
                     <ul className="mt-1 space-y-1">
-                      {project.achievements.slice(0, 2).map((achievement, aIndex) => (
+                      {project.achievements.map((achievement, aIndex) => (
                         <li key={aIndex} className="text-xs text-foreground/60 flex items-start gap-2">
                           <span className="text-[var(--os-cyan)]">▹</span>
                           <span>{achievement}</span>
                         </li>
                       ))}
                     </ul>
+                    {project.technologies && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {project.technologies.map((tech) => (
+                          <span
+                            key={tech}
+                            className="px-2 py-0.5 text-[10px] font-medium bg-foreground/10 text-foreground/70 rounded"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -66,6 +97,12 @@ export function ExperienceContent() {
               <div>
                 <h3 className="font-medium text-foreground text-sm">{edu.degree}</h3>
                 <p className="text-xs text-foreground/60">{edu.institution}</p>
+                {edu.location && (
+                  <p className="text-xs text-foreground/50">📍 {edu.location}</p>
+                )}
+                {edu.focus && (
+                  <p className="text-xs text-foreground/70 italic mt-1">Focus: {edu.focus}</p>
+                )}
                 <p className="text-xs text-[var(--os-cyan)] font-mono mt-1">
                   {edu.duration} • {edu.status}
                 </p>

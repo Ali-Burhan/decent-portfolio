@@ -74,6 +74,17 @@ export function ContactContent() {
           </div>
         </a>
 
+        <a
+          href={`tel:${personalInfo.phone.replace(/\s/g, '')}`}
+          className="p-3 rounded-lg bg-foreground/5 border border-foreground/10 hover:border-[var(--os-cyan)]/30 transition-colors flex items-center gap-3"
+        >
+          <span className="text-xl">📱</span>
+          <div>
+            <p className="text-xs text-foreground/60">Phone</p>
+            <p className="text-sm text-foreground">{personalInfo.phone}</p>
+          </div>
+        </a>
+
         <div className="p-3 rounded-lg bg-foreground/5 border border-foreground/10 flex items-center gap-3">
           <span className="text-xl">📍</span>
           <div>

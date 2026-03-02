@@ -25,14 +25,27 @@ export function ProjectsContent() {
             className="p-4 rounded-lg bg-foreground/5 border border-foreground/10 hover:border-[var(--os-cyan)]/30 transition-colors"
           >
             <div className="flex items-start justify-between gap-3 mb-2">
-              <div>
-                <h3 className="font-semibold text-foreground">{project.name}</h3>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-semibold text-foreground">{project.name}</h3>
+                  {project.url && (
+                    <a
+                      href={project.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-[var(--os-cyan)] hover:underline"
+                      title="View Project"
+                    >
+                      🔗
+                    </a>
+                  )}
+                </div>
                 <p className="text-xs text-foreground/60">
                   {project.company} • {project.type}
                 </p>
               </div>
               <span
-                className={`px-2 py-0.5 text-xs rounded ${
+                className={`px-2 py-0.5 text-xs rounded whitespace-nowrap ${
                   project.type === "Work"
                     ? "bg-blue-500/20 text-blue-400"
                     : "bg-green-500/20 text-green-400"
@@ -42,13 +55,26 @@ export function ProjectsContent() {
               </span>
             </div>
 
-            <p className="text-sm text-foreground/70 mb-3 line-clamp-2">
-              {project.description}
-            </p>
+            {project.description && (
+              <p className="text-sm text-foreground/70 mb-3 line-clamp-2">
+                {project.description}
+              </p>
+            )}
+
+            {project.achievements && project.achievements.length > 0 && (
+              <ul className="mb-3 space-y-1">
+                {project.achievements.slice(0, 3).map((achievement, aIndex) => (
+                  <li key={aIndex} className="text-xs text-foreground/60 flex items-start gap-2">
+                    <span className="text-[var(--os-cyan)]">▹</span>
+                    <span>{achievement}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
 
             {project.technologies && (
               <div className="flex flex-wrap gap-1">
-                {project.technologies.slice(0, 6).map((tech) => (
+                {project.technologies.map((tech) => (
                   <span
                     key={tech}
                     className="px-2 py-0.5 text-xs font-mono bg-[var(--os-cyan)]/10 text-[var(--os-cyan)] rounded"

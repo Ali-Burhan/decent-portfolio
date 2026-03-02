@@ -1,39 +1,23 @@
 {
   "personalInfo": {
     "name": "Ali Burhan",
-    "role": "Full Stack Architect | Next.js • Python • AWS • AI",
-    "description": "Full Stack Developer specializing in Next.js, React, Python, and AWS. I build scalable web applications and AI-powered solutions, from business marketplaces to enterprise safety platforms.",
+    "role": "Full Stack Developer",
+    "description": "Full Stack Developer with 2+ years of experience building scalable cloud applications, AI-powered solutions, and microservices platforms using JavaScript (React, Next.js, Node.js), Python, and AWS cloud services. Specialized in serverless architectures (AWS Lambda, API Gateway, CloudFront), LLM integration (LangChain, RAG), and Infrastructure as Code with Terraform.",
     "availability": "Available for new projects",
     "location": "Lahore, Pakistan",
-    "phone": "03001499488",
+    "phone": "+92 300 1499488",
     "email": "aliburhan.dev.ai@gmail.com",
     "portfolio": "https://aliburhan.vercel.app"
   },
   "socialLinks": {
     "github": "https://github.com/Ali-Burhan",
-    "linkedin": "https://www.linkedin.com/in/ali-burhan-9076b42b6/",
+    "linkedin": "https://linkedin.com/in/ali-burhan-9076b42b6/",
     "portfolio": "https://aliburhan.vercel.app"
   },
   "skills": {
-    "frontend": [
-      "React",
-      "Next.js",
-      "Tailwind CSS",
-      "Vue.js",
-      "TypeScript",
-      "JavaScript",
-      "HTML/CSS"
-    ],
-    "backend": [
-      "Node.js",
-      "Express.js",
-      "NestJS",
-      "Python",
-      "FastAPI",
-      "RESTful APIs",
-      "GraphQL"
-    ],
-    "database": ["MongoDB", "PostgreSQL", "SQL"],
+    "frontend": ["React", "Next.js", "TypeScript", "Tailwind CSS", "Zustand", "React DnD", "JavaScript", "HTML/CSS"],
+    "backend": ["Node.js", "Express.js", "NestJS", "Python", "FastAPI", "RESTful APIs", "WebSockets", "GraphQL"],
+    "database": ["PostgreSQL", "MongoDB", "Redis", "SQL Server", "SQL"],
     "cloudDevOps": [
       "AWS Lambda",
       "AWS API Gateway",
@@ -46,157 +30,141 @@
       "AWS Lightsail",
       "Terraform",
       "Docker",
-      "Jenkins",
+      "Serverless Framework",
       "GitHub Actions",
-      "Serverless Framework"
+      "Jenkins",
+      "CI/CD"
     ],
     "aiMl": [
       "LangChain",
       "OpenAI API",
-      "Hugging Face",
-      "LLMs",
-      "Fine-tuning",
-      "Prompt Engineering",
       "RAG",
-      "PyTorch"
+      "Prompt Engineering",
+      "Vector Embeddings",
+      "LLMs"
     ],
-    "tools": [
-      "VS Code",
-      "Cursor",
-      "Windsurf",
-      "LazyGit",
-      "Git",
-      "JIRA",
-      "Postman"
-    ],
-    "languages": ["JavaScript", "TypeScript", "Python", "SQL", "GraphQL", "HCL"]
+    "testing": ["Jest", "Python unittest", "Pytest"],
+    "tools": ["VS Code", "Cursor", "Windsurf", "LazyGit", "Git", "JIRA"],
+    "methodologies": ["Agile", "Scrum", "Sprint Planning", "Retrospectives", "Story Point Estimation", "Cross-functional Collaboration"],
+    "languages": ["JavaScript", "TypeScript", "Python", "SQL"]
   },
   "experience": [
     {
       "position": "Software Engineer",
       "company": "Hashlogics",
-      "location": "Lahore",
+      "location": "Lahore, Pakistan",
       "duration": "Oct 2024 – Present",
       "projects": [
         {
-          "name": "Lumaya",
-          "duration": "Nov 2024 – Mar 2025",
-          "description": "Engineered a full-stack business marketplace platform processing $10M+ in listings, solving complex KYC verification and real-time communication challenges. Delivered solo in 4 months with 95% KYC success rate and zero-downtime deployment on AWS.",
+          "name": "Forwood Safety",
+          "duration": "Oct 2024 – Present",
+          "url": "https://forwoodsafety.com",
+          "description": "Built and maintained a microservices safety platform deployed across 1,000+ sites globally using Python serverless architecture, reducing infrastructure costs by 30%.",
           "achievements": [
-            "Developed full-stack business selling platform (lumaya.ch) using Next.js and Python FastAPI, handling 50+ business listings worth $10M+ total value",
-            "Built responsive frontend with TypeScript and integrated Veriff KYC API for identity verification, processing 100+ verifications with 95% success rate",
-            "Implemented real-time WebSocket chat enabling direct buyer-seller communication, with message history and file attachment support",
-            "Deployed complete solution on AWS Lightsail, managing PostgreSQL database, SSL certificates, and production environment independently",
-            "Delivered end-to-end solution solo in 4 months, from architecture through deployment"
+            "Built microservices safety platform using Python serverless architecture (AWS Lambda, API Gateway, SQS, Kinesis) deployed across 1,000+ sites globally, reducing infrastructure costs by 30%",
+            "Spearheaded backend architecture for Safety+ mobile app and automated infrastructure with Terraform, cutting deployment time from 2 hours to 15 minutes across dev, staging, and production environments",
+            "Implemented E2E testing suite using Pytest, automating user login flows, API endpoint validation, and regression checks, reducing post-release defects by 25%",
+            "Served as Release Manager coordinating quarterly releases and hotfixes via Jira and Jenkins pipelines, maintaining 99.9% platform uptime with zero-downtime deployments"
           ],
-          "technologies": [
-            "Next.js",
-            "Python",
-            "FastAPI",
-            "TypeScript",
-            "WebSocket",
-            "AWS Lightsail",
-            "PostgreSQL"
-          ]
+          "technologies": ["Python", "React", "Terraform", "AWS", "Jest", "Pytest"]
         },
         {
-          "name": "Forwood Safety (Workplace Safety Platform)",
-          "duration": "Mar 2025 – Present",
-          "description": "Architected and scaled microservices platform serving 1000+ workplace sites across 60+ countries, preventing fatalities through real-time safety monitoring. Built AI-powered ATS with LangChain and orchestrated zero-downtime quarterly releases as Release Manager.",
+          "name": "Lumaya",
+          "duration": "Nov 2024 – Mar 2025",
+          "url": "https://lumaya.ch",
+          "description": "Architected and delivered a full-stack business marketplace as sole developer in 4 months, 50+ listings worth $10M+ total value, from requirements through production.",
           "achievements": [
-            "Contributing to microservices-based safety management platform deployed across 1000+ sites in 60+ countries, preventing workplace fatalities",
-            "Developed and maintained backend services in Python using serverless architecture (AWS Lambda, API Gateway, CloudFront, SQS, Kinesis)",
-            "Implemented Infrastructure as Code with Terraform for automated deployments across dev, staging, and production environments",
-            "Serving as Release Manager, coordinating quarterly releases and hotfixes through Jira and Jenkins pipelines, ensuring zero-downtime deployments",
-            "Built AI-powered ATS resume screening tool using LangChain and LLMs for automated candidate evaluation and matching",
-            "Developed Trivia Quiz Game and internal client tools using cloud-native development practices",
-            "Gained hands-on experience with cross-functional collaboration and modern DevOps workflows"
+            "Architected and delivered full-stack business marketplace (lumaya.ch) as sole developer in 4 months, 50+ listings worth $10M+ total value, from requirements through production",
+            "Integrated Veriff KYC for identity verification (100+ verifications, 95% success rate) and real-time WebSocket chat with file attachments and read receipts",
+            "Deployed on AWS Lightsail managing PostgreSQL optimization, SSL, and production environment with 99.8% uptime"
           ],
-          "technologies": [
-            "Python",
-            "AWS Lambda",
-            "AWS API Gateway",
-            "AWS CloudFront",
-            "AWS SQS",
-            "AWS Kinesis",
-            "Terraform",
-            "Jenkins",
-            "JIRA",
-            "LangChain",
-            "LLMs"
-          ]
+          "technologies": ["Next.js", "TypeScript", "FastAPI", "PostgreSQL", "AWS Lightsail", "WebSockets", "Veriff KYC"]
         }
       ]
     },
     {
       "position": "Associate Software Engineer",
       "company": "Techling",
-      "location": "Sheikhupura",
+      "location": "Sheikhupura, Pakistan",
       "duration": "May 2024 – Oct 2024",
       "projects": [
         {
-          "name": "CazVid (AI-Driven Job Platform)",
-          "duration": "Nov 2024 – Mar 2025",
-          "description": "Built AI-powered global job platform supporting 150+ languages with intelligent resume screening and real-time candidate scoring. Optimized performance by 40% through advanced code splitting while delivering complex Kanban recruiter dashboard with drag-and-drop workflows.",
+          "name": "CazVid",
+          "duration": "May 2024 – Oct 2024",
+          "url": "https://cazvid.com",
+          "description": "Built 25+ frontend components for an AI-driven job board serving 150+ languages globally, integrating 20+ RESTful APIs with NestJS/MongoDB backend.",
           "achievements": [
-            "Developed AI-driven job board platform serving 150+ languages globally, building complex frontend components in Next.js with Zustand state management",
-            "Integrated 20+ RESTful APIs between Next.js frontend and NestJS/MongoDB backend, enabling real-time AI resume screening and candidate scoring",
-            "Built Kanban-style recruiter dashboard with drag-and-drop functionality for managing job postings, applications, and AI-generated interview workflows",
-            "Optimized application performance by 40% through code splitting, lazy loading, and implementing mobile-first responsive design across device types"
+            "Built 25+ frontend components for AI-driven job board serving 150+ languages globally, integrating 20+ RESTful APIs with NestJS/MongoDB backend for real-time AI resume screening and automated job matching",
+            "Developed Kanban recruiter dashboard with React DnD managing 500+ postings and optimized performance by 40% via code splitting and lazy loading, improving Core Web Vitals"
           ],
-          "technologies": [
-            "Next.js",
-            "NestJS",
-            "MongoDB",
-            "Zustand",
-            "RESTful APIs",
-            "AI",
-            "TypeScript"
-          ]
+          "technologies": ["Next.js", "Zustand", "NestJS", "MongoDB", "React DnD"]
         }
       ]
     }
   ],
+  "certificates": [
+    {
+      "name": "AWS Certified Cloud Practitioner",
+      "issuer": "Amazon Web Services (AWS)",
+      "issueDate": "2024",
+      "skills": ["AWS Cloud", "Cloud Computing", "Infrastructure", "Security"]
+    },
+    {
+      "name": "Python Essentials 1",
+      "issuer": "Cisco",
+      "issueDate": "2024",
+      "skills": ["Python", "Programming Basics", "Data Types", "Control Flow"]
+    },
+    {
+      "name": "Python Essentials 2",
+      "issuer": "Cisco",
+      "issueDate": "2024",
+      "skills": ["Python", "OOP", "Advanced Programming", "Algorithms"]
+    }
+  ],
   "freelanceProjects": [
     {
-      "name": "TeachTrack AI",
-      "description": "Created AI-driven educational platform automating 500+ monthly assessments, slashing teacher workload by 70% through GPT-4 powered test generation. Implemented LangChain RAG to process 1,000+ curriculum pages, delivering instant grading and personalized feedback at scale.",
+      "name": "Emotion-Aware Multilingual Voice Processing System",
+      "url": "https://fe-ai-text-and-speech.vercel.app/",
+      "description": "Designed an end-to-end voice processing pipeline that records audio, detects emotional tone, performs Speech-to-Text, translates bidirectionally (EN ↔ ES), and generates emotion-preserving TTS output.",
       "achievements": [
-        "Developed AI-powered educational platform for schools, automating test creation and grading for 500+ assessments monthly",
-        "Built intelligent test generator using GPT-4 and prompt engineering, creating customized assessments based on curriculum requirements and difficulty levels",
-        "Implemented automated grading system with AI-powered answer evaluation, reducing teacher workload by 70% and providing instant feedback to students",
-        "Integrated LangChain RAG framework for document processing, enabling curriculum-based question generation from 1,000+ pages of educational materials"
+        "Designed end-to-end voice processing pipeline recording audio, detecting emotional tone via OpenSmile, Speech-to-Text with Deepgram, bidirectional translation (EN ↔ ES) via DeepL, and emotion-preserving TTS using ElevenLabs API",
+        "Built RESTful APIs with FastAPI orchestrating all service communication with structured error handling and fault tolerance across the full pipeline"
       ],
-      "technologies": [
-        "Python",
-        "LangChain",
-        "OpenAI API",
-        "Next.js",
-        "RAG",
-        "GPT-4"
-      ]
+      "technologies": ["FastAPI", "Next.js", "Deepgram API", "OpenSmile", "DeepL API", "ElevenLabs API"]
+    },
+    {
+      "name": "TeachTrack AI",
+      "description": "Built an AI-powered educational platform automating test creation and grading for 500+ monthly assessments across 3 schools, serving 1,200+ students and 45+ teachers.",
+      "achievements": [
+        "Built AI-powered educational platform automating test creation and grading for 500+ monthly assessments across 3 schools, serving 1,200+ students and 45+ teachers",
+        "Engineered GPT-4 test generator with custom prompt templates reducing teacher prep time by 70%, and automated grader achieving 92% accuracy vs. manual grading",
+        "Integrated LangChain RAG with vector embeddings for curriculum-based question generation from 1,000+ pages of educational materials"
+      ],
+      "technologies": ["Python", "LangChain", "OpenAI API", "Next.js", "RAG", "Vector Embeddings"]
     }
   ],
   "education": [
     {
-      "degree": "Masters of Computer Science",
+      "degree": "Master of Computer Science",
       "institution": "University of Engineering and Technology (UET)",
       "location": "Lahore",
-      "duration": "2025 - 2027",
+      "focus": "ML, Cloud Computing, Distributed Systems",
+      "duration": "2025 – 2027",
       "status": "In Progress"
     },
     {
       "degree": "Bachelor of Computer Science",
       "institution": "NFC Institute of Engineering and Fertilizer Research",
       "location": "Faisalabad",
-      "duration": "2020 - 2024",
+      "duration": "Sep 2020 – Oct 2024",
       "status": "Completed"
     }
   ],
   "highlights": {
-    "yearsExperience": "3+",
-    "projectsCompleted": "10+",
+    "yearsExperience": "2+",
+    "projectsCompleted": "6+",
     "technologies": "30+",
-    "clients": "5+"
+    "sites": "1000+"
   }
 }

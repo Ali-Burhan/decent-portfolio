@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface WindowProps {
@@ -14,7 +14,31 @@ interface WindowProps {
   onFocus: () => void;
 }
 
-export function Window({
+// Static icons object - defined outside component to prevent recreation
+const WINDOW_ICONS: Record<string, React.ReactNode> = {
+  about: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+    </svg>
+  ),
+  projects: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+    </svg>
+  ),
+  experience: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    </svg>
+  ),
+  contact: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    </svg>
+  ),
+};
+
+export const Window = React.memo(function Window({
   id,
   title,
   children,
@@ -65,7 +89,7 @@ export function Window({
     return () => window.removeEventListener("resize", setupWindow);
   }, [id]);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest(".window-controls")) return;
     if (isMaximized) return;
     onFocus();
@@ -74,10 +98,10 @@ export function Window({
       x: e.clientX - position.x,
       y: e.clientY - position.y,
     });
-  };
+  }, [isMaximized, onFocus, position.x, position.y]);
 
   // Touch handling for mobile drag
-  const handleTouchStart = (e: React.TouchEvent) => {
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if ((e.target as HTMLElement).closest(".window-controls")) return;
     if (isMaximized || isMobile) return;
     onFocus();
@@ -87,7 +111,7 @@ export function Window({
       x: touch.clientX - position.x,
       y: touch.clientY - position.y,
     });
-  };
+  }, [isMaximized, isMobile, onFocus, position.x, position.y]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -126,37 +150,14 @@ export function Window({
     };
   }, [isDragging, dragOffset, isMaximized]);
 
-  const handleMaximize = () => {
+  const handleMaximize = useCallback(() => {
     if (!isMobile) {
       setIsMaximized(!isMaximized);
     }
     onFocus();
-  };
+  }, [isMobile, isMaximized, onFocus]);
 
   if (!isReady) return null;
-
-  const windowIcons: Record<string, React.ReactNode> = {
-    about: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-      </svg>
-    ),
-    projects: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-      </svg>
-    ),
-    experience: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-      </svg>
-    ),
-    contact: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-      </svg>
-    ),
-  };
 
   return (
     <AnimatePresence>
@@ -194,7 +195,7 @@ export function Window({
           >
             {/* Window Icon and Title */}
             <div className="flex items-center gap-2 text-sm text-[var(--os-window-text)]">
-              <span className="text-[var(--os-cyan)]">{windowIcons[id]}</span>
+              <span className="text-[var(--os-cyan)]">{WINDOW_ICONS[id]}</span>
               <span className="font-medium">{title}</span>
             </div>
 
@@ -247,4 +248,4 @@ export function Window({
       )}
     </AnimatePresence>
   );
-}
+});

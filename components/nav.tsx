@@ -27,32 +27,39 @@ const accents = [
   { name: "Electric Cyan", value: "electric-cyan", color: "#06B6D4" },
 ];
 
-// NavLink component with magnetic hover effect
-function NavLink({ link, isActive, onClick }: { link: { name: string; href: string; sectionId: string }; isActive: boolean; onClick: () => void }) {
+// NavLink component with optimized magnetic hover effect (memoized for performance)
+const NavLink = React.memo(function NavLink({ link, isActive, onClick }: { link: { name: string; href: string; sectionId: string }; isActive: boolean; onClick: () => void }) {
   const ref = useRef<HTMLAnchorElement>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  // Check for reduced motion preference
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduceMotion(mediaQuery.matches);
+    const handler = (e: MediaQueryListEvent) => setReduceMotion(e.matches);
+    mediaQuery.addEventListener("change", handler);
+    return () => mediaQuery.removeEventListener("change", handler);
+  }, []);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
-  const springConfig = { stiffness: 150, damping: 15, mass: 0.1 };
+  // Simplified spring config for better performance
+  const springConfig = { stiffness: 300, damping: 25, mass: 0.2 };
   const xSpring = useSpring(x, springConfig);
   const ySpring = useSpring(y, springConfig);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (!ref.current) return;
+    if (!ref.current || reduceMotion) return;
 
     const rect = ref.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
 
-    // Calculate distance from center
-    const distanceX = e.clientX - centerX;
-    const distanceY = e.clientY - centerY;
-
-    // Apply magnetic effect (move toward cursor)
-    x.set(distanceX * 0.3);
-    y.set(distanceY * 0.3);
+    // Reduced magnetic effect intensity (from 0.3 to 0.15)
+    x.set((e.clientX - centerX) * 0.15);
+    y.set((e.clientY - centerY) * 0.15);
   };
 
   const handleMouseLeave = () => {
@@ -73,10 +80,10 @@ function NavLink({ link, isActive, onClick }: { link: { name: string; href: stri
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
       className="relative px-4 py-2 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors duration-300 group"
-      style={{ x: xSpring, y: ySpring }}
+      style={{ x: reduceMotion ? 0 : xSpring, y: reduceMotion ? 0 : ySpring }}
     >
       {link.name}
-      
+
       {/* Hover Background */}
       <motion.span
         className="absolute inset-0 bg-foreground/5 rounded-lg"
@@ -84,54 +91,18 @@ function NavLink({ link, isActive, onClick }: { link: { name: string; href: stri
         animate={{ opacity: isHovered ? 1 : 0, scale: isHovered ? 1 : 0.8 }}
         transition={{ duration: 0.2 }}
       />
-      
-      {/* Active Indicator */}
+
+      {/* Active Indicator - Simplified (removed glow and particles) */}
       {isActive && (
-        <>
-          <motion.span
-            layoutId="nav-active"
-            className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent"
-            transition={{ type: "spring", stiffness: 380, damping: 30 }}
-          />
-          
-          {/* Glow Effect */}
-          <motion.span
-            className="absolute inset-0 bg-accent/10 rounded-lg blur-sm"
-            animate={{
-              opacity: [0.3, 0.6, 0.3],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-          
-          {/* Floating Particles */}
-          {[...Array(3)].map((_, i) => (
-            <motion.span
-              key={i}
-              className="absolute w-1 h-1 bg-accent/50 rounded-full"
-              style={{
-                left: `${30 + i * 20}%`,
-                top: "50%",
-              }}
-              animate={{
-                y: [-10, -20, -10],
-                opacity: [0, 1, 0],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                delay: i * 0.3,
-              }}
-            />
-          ))}
-        </>
+        <motion.span
+          layoutId="nav-active"
+          className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent"
+          transition={{ type: "spring", stiffness: 380, damping: 30 }}
+        />
       )}
     </motion.a>
   );
-}
+});
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);

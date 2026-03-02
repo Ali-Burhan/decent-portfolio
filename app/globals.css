@@ -173,6 +173,48 @@ body {
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
 }
 
+/* Performance optimizations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* GPU acceleration for common animations */
+.will-gpu {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Fast hover and active scales */
+.hover-scale-108:hover {
+  transform: scale(1.08);
+}
+
+.active-scale-92:active {
+  transform: scale(0.92);
+}
+
+.hover-scale-105:hover {
+  transform: scale(1.05);
+}
+
+.active-scale-95:active {
+  transform: scale(0.95);
+}
+
+/* Instant response for these classes */
+.hover-scale-108,
+.hover-scale-105,
+.active-scale-92,
+.active-scale-95 {
+  transition: transform 75ms ease-out;
+}
+
 /* Hide scrollbar utility */
 .scrollbar-hide {
   -ms-overflow-style: none;
