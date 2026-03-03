@@ -2,57 +2,60 @@ import { Metadata } from "next";
 import { Desktop } from "@/components/os";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://aliofficial.vercel.app"),
+  metadataBase: new URL("https://aliburhan.com"),
   title: "Ali Burhan | Full Stack Architect | Next.js • Python • AWS • AI",
   description:
-    "Ali Burhan: Full Stack Developer specializing in Next.js, React, Python, AWS & AI. Building scalable web applications and AI-powered solutions. Based in Lahore, Pakistan.",
+    "Ali Burhan is a Full Stack Developer & Architect with 3+ years experience. Expert in Next.js, React, Python, AWS & AI. Building scalable solutions serving 1000+ sites globally from Lahore, Pakistan.",
   keywords: [
+    "Ali Burhan",
     "Full Stack Developer",
     "Full Stack Architect",
     "Next.js Developer",
     "React Developer",
     "Python Developer",
     "AWS Developer",
-    "AI Developer",
+    "AI Engineer",
     "LangChain",
-    "Web Developer",
-    "Portfolio",
-    "Ali Burhan",
+    "RAG Developer",
+    "LLM Developer",
+    "Serverless Architect",
+    "Software Engineer",
     "Lahore Developer",
     "Pakistan Developer",
-    "Software Engineer",
+    "Web Developer",
+    "Cloud Architect",
   ],
-  authors: [{ name: "Ali Burhan", url: "https://aliofficial.vercel.app" }],
+  authors: [{ name: "Ali Burhan", url: "https://aliburhan.com" }],
   creator: "Ali Burhan",
   publisher: "Ali Burhan",
   alternates: {
-    canonical: "https://aliofficial.vercel.app",
+    canonical: "https://aliburhan.com",
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://aliofficial.vercel.app",
-    siteName: "Ali Burhan - Full Stack Developer Portfolio",
+    url: "https://aliburhan.com",
+    siteName: "Ali Burhan Portfolio",
     title: "Ali Burhan | Full Stack Architect | Next.js • Python • AWS • AI",
     description:
-      "Ali Burhan: Full Stack Developer specializing in Next.js, React, Python, AWS & AI. Building scalable web applications and AI-powered solutions.",
+      "Ali Burhan is a Full Stack Developer & Architect with 3+ years experience. Expert in Next.js, React, Python, AWS & AI. Building scalable solutions serving 1000+ sites globally.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Ali Burhan - Full Stack Developer Portfolio",
+        alt: "Ali Burhan - Full Stack Developer & Architect Portfolio",
         type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    site: "@aliburhan",
-    creator: "@aliburhan",
+    site: "@aliburhan_dev",
+    creator: "@aliburhan_dev",
     title: "Ali Burhan | Full Stack Architect | Next.js • Python • AWS • AI",
     description:
-      "Ali Burhan: Full Stack Developer specializing in Next.js, React, Python, AWS & AI. Building scalable web applications.",
+      "Ali Burhan is a Full Stack Developer & Architect with 3+ years experience. Expert in Next.js, React, Python, AWS & AI.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -65,9 +68,6 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
       "max-snippet": -1,
     },
-  },
-  verification: {
-    google: "your-google-verification-code",
   },
 };
 
@@ -112,11 +112,56 @@ export default function Home() {
     },
   };
 
+  const webSiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Ali Burhan Portfolio",
+    url: "https://aliburhan.com",
+    description: "Full Stack Developer & Architect specializing in Next.js, React, Python, AWS & AI",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://aliburhan.com/search?q={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Ali Burhan",
+      url: "https://aliburhan.com",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://aliburhan.com/og-image.png",
+        width: 1200,
+        height: 630,
+      },
+    },
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://aliburhan.com",
+      },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <Desktop />
     </>

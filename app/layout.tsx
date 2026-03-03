@@ -17,50 +17,63 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://aliofficial.vercel.app"),
+  metadataBase: new URL("https://aliburhan.com"),
   title: {
-    default: "Ali Burhan - Full Stack Developer Portfolio",
+    default: "Ali Burhan - Full Stack Developer | Next.js • Python • AWS • AI",
     template: "%s | Ali Burhan",
   },
   description:
-    "Full Stack Developer specializing in Next.js, Python, AWS & AI. Building scalable cloud-native solutions serving 1000+ sites across 60+ countries.",
+    "Ali Burhan - Full Stack Developer & Architect specializing in Next.js, React, Python, AWS & AI. Building scalable cloud-native solutions serving 1000+ sites globally. Based in Lahore, Pakistan.",
   keywords: [
+    "Ali Burhan",
     "Full Stack Developer",
-    "Next.js",
-    "React",
-    "Python",
-    "AWS",
-    "LangChain",
-    "AI",
+    "Full Stack Architect",
+    "Next.js Developer",
+    "React Developer",
+    "Python Developer",
+    "AWS Developer",
+    "AI Engineer",
+    "LangChain Developer",
     "Web Developer",
     "Software Engineer",
-    "Lahore",
-    "Pakistan",
+    "Lahore Developer",
+    "Pakistan Developer",
+    "Serverless Architect",
+    "Cloud Engineer",
+    "LLM Developer",
+    "RAG Developer",
+    "Full Stack Pakistan",
   ],
-  authors: [{ name: "Ali Burhan", url: "https://aliofficial.vercel.app" }],
+  authors: [{ name: "Ali Burhan", url: "https://aliburhan.com" }],
   creator: "Ali Burhan",
+  publisher: "Ali Burhan",
+  category: "Technology",
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://aliofficial.vercel.app",
+    alternateLocale: ["es_ES", "fr_FR"],
+    url: "https://aliburhan.com",
     siteName: "Ali Burhan Portfolio",
-    title: "Ali Burhan - Full Stack Developer",
+    title: "Ali Burhan - Full Stack Developer | Next.js • Python • AWS • AI",
     description:
-      "Full Stack Developer specializing in Next.js, Python, AWS & AI. Building scalable cloud-native solutions.",
+      "Ali Burhan is a Full Stack Developer & Architect specializing in Next.js, React, Python, AWS & AI. Building scalable cloud-native solutions serving 1000+ sites globally.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Ali Burhan - Full Stack Developer Portfolio",
+        alt: "Ali Burhan - Full Stack Developer & Architect",
+        type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Ali Burhan - Full Stack Developer",
+    site: "@aliburhan_dev",
+    creator: "@aliburhan_dev",
+    title: "Ali Burhan - Full Stack Developer | Next.js • Python • AWS • AI",
     description:
-      "Full Stack Developer specializing in Next.js, Python, AWS & AI.",
+      "Full Stack Developer & Architect specializing in Next.js, React, Python, AWS & AI. Building scalable cloud-native solutions.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -75,7 +88,10 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: "your-google-verification-code",
+    google: process.env.GOOGLE_SITE_VERIFICATION || "",
+  },
+  alternates: {
+    canonical: "https://aliburhan.com",
   },
 };
 
