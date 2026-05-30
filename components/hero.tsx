@@ -3,6 +3,10 @@ import React from "react";
 import { motion } from "framer-motion";
 import portfolioData from "../data/portfolio.json";
 import { useI18n } from "@/lib/i18n";
+import { RESUME_FILENAME, RESUME_PATH } from "@/lib/site";
+import { portfolioCtaStyle } from "@/lib/portfolio-cta-styles";
+import { FeaturedProjectsRow } from "@/components/featured-projects-row";
+import { Download, Briefcase } from "lucide-react";
 
 export function Hero() {
   const { personalInfo, socialLinks } = portfolioData;
@@ -101,32 +105,38 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
+            className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4 mb-12 w-full max-w-2xl mx-auto px-2"
           >
             <a
-              href="#projects"
-              className="group px-8 py-3.5 bg-accent text-white font-semibold rounded-lg hover:bg-accent/90 transition-colors shadow-lg shadow-accent/20"
+              href={RESUME_PATH}
+              download={RESUME_FILENAME}
+              style={portfolioCtaStyle.lg}
+              className="shrink-0 rounded-lg bg-accent text-white shadow-lg shadow-accent/25 hover:brightness-105 transition-all sm:flex-none"
+              aria-label={t("nav.downloadResume")}
             >
-              <span className="flex items-center gap-2">
-                {t("hero.viewMyWork")}
-                <svg
-                  className="w-4 h-4 group-hover:translate-x-1 transition-transform"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </span>
+              <Download className="h-5 w-5 shrink-0" aria-hidden />
+              {t("nav.downloadResume")}
             </a>
 
             <a
               href="#contact"
-              className="px-8 py-3.5 bg-foreground/5 border border-foreground/10 text-foreground font-semibold rounded-lg hover:border-accent/50 hover:bg-accent/5 transition-all"
+              style={portfolioCtaStyle.lg}
+              className="shrink-0 rounded-lg border-2 border-accent/50 bg-accent/10 text-foreground transition-all hover:border-accent/60 hover:bg-accent/15 sm:flex-none"
+              aria-label={t("hero.hireMe")}
             >
-              {t("hero.letsTalk")}
+              <Briefcase className="h-5 w-5 text-accent" aria-hidden />
+              {t("hero.hireMe")}
+            </a>
+
+            <a
+              href="#projects"
+              className="px-6 py-3.5 text-sm font-semibold text-foreground/70 underline-offset-4 hover:text-accent hover:underline transition-colors"
+            >
+              {t("hero.viewMyWork")}
             </a>
           </motion.div>
+
+          <FeaturedProjectsRow variant="site" />
 
           {/* Social Links */}
           <motion.div

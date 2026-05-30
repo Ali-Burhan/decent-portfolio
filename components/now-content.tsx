@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { BookOpen, Code, Target, MapPin, Mail, Calendar } from "lucide-react";
 
 export function NowContent() {
-  const lastUpdated = "December 2025";
+  const lastUpdated = "May 2026";
 
   return (
     <div className="min-h-screen bg-background">
@@ -69,12 +69,12 @@ export function NowContent() {
               </h3>
               <div className="flex flex-wrap gap-2">
                 {[
-                  "Advanced LangChain patterns",
-                  "AWS CDK",
-                  "Next.js 15",
-                  "React Server Components",
+                  "AWS CDK & IaC patterns",
+                  "Advanced LangChain & RAG",
+                  "Next.js 16 / React 19",
+                  "Distributed systems (MCS coursework)",
+                  "Terraform at scale",
                   "Vector databases",
-                  "Agent frameworks",
                 ].map((skill) => (
                   <span
                     key={skill}
@@ -102,19 +102,19 @@ export function NowContent() {
               <ul className="space-y-2 text-foreground/80">
                 <li className="flex items-start gap-2">
                   <span className="text-accent mt-1">▹</span>
-                  <span>Scaling Forwood Safety platform to new markets</span>
+                  <span>Forwood Safety — Python serverless platform across 1,000+ sites</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-accent mt-1">▹</span>
-                  <span>Building AI-powered internal tools with LangChain</span>
+                  <span>Terraform pipelines cutting deploy time to ~15 minutes</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-accent mt-1">▹</span>
-                  <span>Optimizing microservices for performance</span>
+                  <span>LangChain tooling for internal AI workflows</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-accent mt-1">▹</span>
-                  <span>Leading quarterly release cycles as Release Manager</span>
+                  <span>Release management — quarterly releases & hotfixes</span>
                 </li>
               </ul>
             </div>
@@ -126,15 +126,15 @@ export function NowContent() {
               <ul className="space-y-2 text-foreground/80">
                 <li className="flex items-start gap-2">
                   <span className="text-accent mt-1">▹</span>
-                  <span>Personal AI assistant using GPT-4 and voice</span>
+                  <span>TeachTrack AI — curriculum RAG & assessment automation</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-accent mt-1">▹</span>
-                  <span>Open-source Next.js starter template</span>
+                  <span>Portfolio case studies & recruiter-first homepage UX</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-accent mt-1">▹</span>
-                  <span>Technical blog on Full Stack + AI topics</span>
+                  <span>Emotion-aware voice pipeline (FastAPI + Next.js demo)</span>
                 </li>
               </ul>
             </div>
@@ -150,14 +150,14 @@ export function NowContent() {
           <div className="space-y-6">
             <div>
               <h3 className="text-xl font-bold text-foreground mb-3">
-                Q1 2025
+                2026
               </h3>
               <div className="grid gap-3">
                 {[
-                  "Publish 4 technical blog posts",
-                  "Contribute to 2 open-source projects",
-                  "Complete AWS Solutions Architect certification",
-                  "Build portfolio of 3 AI-powered tools",
+                  "Progress MCS coursework (ML, cloud, distributed systems)",
+                  "Deepen AWS CDK + Terraform automation skills",
+                  "Ship TeachTrack case study & demo flow",
+                  "Grow public GitHub pins aligned with portfolio projects",
                 ].map((goal, i) => (
                   <motion.div
                     key={goal}

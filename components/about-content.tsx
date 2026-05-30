@@ -2,14 +2,16 @@
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Section } from "@/components/section";
 import portfolioData from "@/data/portfolio.json";
 import { useI18n } from "@/lib/i18n";
 import { Nav } from "@/components/nav";
+import { SiteFooter } from "@/components/site-footer";
 
 export function AboutContent() {
-  const { personalInfo, skills } = portfolioData;
+  const { personalInfo, skills, socialLinks } = portfolioData;
   const { t } = useI18n();
 
   const skillCategories = [
@@ -133,8 +135,8 @@ export function AboutContent() {
                 {/* Profile Image */}
                 <div className="relative aspect-square rounded-2xl overflow-hidden bg-foreground/5 border border-foreground/10">
                   <Image
-                    src="/ali pic.png"
-                    alt={`Portrait of ${personalInfo.name} - Full Stack Developer`}
+                    src="/ali-burhan.jpg"
+                    alt={`Portrait of ${personalInfo.name} - Full Stack Engineer`}
                     fill
                     sizes="(max-width: 768px) 100vw, 300px"
                     className="object-cover"
@@ -167,11 +169,36 @@ export function AboutContent() {
                     </div>
                   </div>
                 </div>
+
+                <div className="p-4 rounded-xl border border-foreground/10 bg-foreground/[0.02]">
+                  <h3 className="text-sm font-semibold text-foreground mb-2">Code & proof</h3>
+                  <p className="text-sm text-foreground/65 leading-relaxed mb-3">
+                    Open-source and sample work lives on{" "}
+                    <a
+                      href={socialLinks.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-accent hover:underline"
+                    >
+                      GitHub
+                    </a>
+                    . Pin repositories that match the case studies on the Projects page — see{" "}
+                    <code className="text-xs bg-foreground/5 px-1 rounded">GITHUB_PINS.md</code> in
+                    this repo for suggestions.
+                  </p>
+                  <Link
+                    href="/projects"
+                    className="text-sm font-medium text-accent hover:underline"
+                  >
+                    View project case studies →
+                  </Link>
+                </div>
               </motion.div>
             </div>
           </div>
         </Section>
       </main>
+      <SiteFooter />
     </div>
   );
 }

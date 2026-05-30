@@ -4,7 +4,9 @@ import React, { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Section } from "@/components/section";
 import { Nav } from "@/components/nav";
+import { SiteFooter } from "@/components/site-footer";
 import { ProjectCard } from "@/components/project-card";
+import { FeaturedProjectsRow } from "@/components/featured-projects-row";
 import portfolioData from "@/data/portfolio.json";
 import { useI18n } from "@/lib/i18n";
 
@@ -16,9 +18,19 @@ export function ProjectsContent() {
   const allProjects = useMemo(
     () => [
       ...experience.flatMap((exp) =>
-        (exp.projects || []).map((p) => ({ ...p, type: "Work" as const }))
+        (exp.projects || []).map((p) => ({
+          ...p,
+          type: "Work" as const,
+          slug: "slug" in p ? (p as { slug?: string }).slug : undefined,
+          liveUrl: "url" in p && p.url ? p.url : undefined,
+        }))
       ),
-      ...freelanceProjects.map((p) => ({ ...p, type: "Freelance" as const })),
+      ...freelanceProjects.map((p) => ({
+        ...p,
+        type: "Freelance" as const,
+        slug: "slug" in p ? (p as { slug?: string }).slug : undefined,
+        liveUrl: "url" in p && p.url ? p.url : undefined,
+      })),
     ],
     [experience, freelanceProjects]
   );
@@ -89,6 +101,8 @@ export function ProjectsContent() {
               ))}
             </motion.div>
 
+            <FeaturedProjectsRow variant="site" />
+
             {/* Projects Grid */}
             <AnimatePresence mode="wait">
               <motion.div
@@ -118,6 +132,7 @@ export function ProjectsContent() {
           </div>
         </Section>
       </main>
+      <SiteFooter />
     </div>
   );
 }

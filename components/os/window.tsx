@@ -1,139 +1,178 @@
 "use client";
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { User, FolderOpen, Briefcase, Mail, Minus, Square, X, Copy } from "lucide-react";
+
+import { windowStackZ } from "@/lib/os-layers";
+
+const TASKBAR_HEIGHT = 48;
 
 interface WindowProps {
   id: string;
   title: string;
   children: React.ReactNode;
   isMinimized: boolean;
+  isMaximized: boolean;
   zIndex: number;
   isActive: boolean;
+  /** Space for navbar when window is restored */
+  topInset: number;
   onClose: () => void;
   onMinimize: () => void;
+  onToggleMaximize: () => void;
   onFocus: () => void;
 }
 
-// Static icons object - defined outside component to prevent recreation
 const WINDOW_ICONS: Record<string, React.ReactNode> = {
-  about: (
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-    </svg>
-  ),
-  projects: (
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-    </svg>
-  ),
-  experience: (
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-    </svg>
-  ),
-  contact: (
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-    </svg>
-  ),
+  about: <User className="h-4 w-4" strokeWidth={2.25} />,
+  projects: <FolderOpen className="h-4 w-4" strokeWidth={2.25} />,
+  experience: <Briefcase className="h-4 w-4" strokeWidth={2.25} />,
+  contact: <Mail className="h-4 w-4" strokeWidth={2.25} />,
 };
+
+function WindowActionButton({
+  onClick,
+  label,
+  children,
+  variant = "default",
+}: {
+  onClick: (e: React.MouseEvent) => void;
+  label: string;
+  children: React.ReactNode;
+  variant?: "default" | "close";
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`window-action-btn flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
+        variant === "close"
+          ? "text-[var(--os-text-muted)] hover:bg-red-500/15 hover:text-red-600 dark:hover:text-red-400"
+          : "text-[var(--os-text-muted)] hover:bg-[var(--os-icon-hover)] hover:text-[var(--os-text-primary)]"
+      }`}
+      aria-label={label}
+      title={label}
+    >
+      {children}
+    </button>
+  );
+}
 
 export const Window = React.memo(function Window({
   id,
   title,
   children,
   isMinimized,
+  isMaximized,
   zIndex,
   isActive,
+  topInset,
   onClose,
   onMinimize,
+  onToggleMaximize,
   onFocus,
 }: WindowProps) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
-  const [isMaximized, setIsMaximized] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isMobile, setIsMobile] = useState(false);
   const [windowSize, setWindowSize] = useState({ width: 800, height: 550 });
   const [isReady, setIsReady] = useState(false);
 
-  // Check for mobile and center window
+  const stackZ = windowStackZ(zIndex);
+  const fillScreen = isMaximized;
+  const chromeTop = Math.min(280, Math.max(56, topInset));
+
   useEffect(() => {
     const setupWindow = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
 
-      if (mobile) {
-        setIsMaximized(true);
-      } else {
-        // Calculate window size - larger for better content visibility
-        const width = Math.min(850, window.innerWidth - 80);
-        const height = Math.min(600, window.innerHeight - 100);
-        setWindowSize({ width, height });
-
-        // Center the window with offset based on window id
-        const index = ["about", "projects", "experience", "contact"].indexOf(id);
-        const offsetX = index * 30;
-        const offsetY = index * 30;
-
-        const centerX = Math.max(40, (window.innerWidth - width) / 2 + offsetX);
-        const centerY = Math.max(20, (window.innerHeight - height - 48) / 2 + offsetY);
-
-        setPosition({ x: centerX, y: centerY });
+      if (fillScreen) {
+        setIsReady(true);
+        return;
       }
+
+      const width = Math.min(860, window.innerWidth - 64);
+      const height = Math.min(
+        620,
+        window.innerHeight - chromeTop - TASKBAR_HEIGHT - 24
+      );
+      setWindowSize({ width, height: Math.max(320, height) });
+
+      const index = ["about", "projects", "experience", "contact"].indexOf(id);
+      const offsetX = index * 28;
+      const offsetY = index * 28;
+
+      const centerX = Math.max(32, (window.innerWidth - width) / 2 + offsetX);
+      const centerY = Math.max(
+        chromeTop,
+        (window.innerHeight - height - TASKBAR_HEIGHT) / 2 + offsetY
+      );
+
+      setPosition({ x: centerX, y: centerY });
       setIsReady(true);
     };
 
     setupWindow();
     window.addEventListener("resize", setupWindow);
     return () => window.removeEventListener("resize", setupWindow);
-  }, [id]);
+  }, [id, fillScreen, chromeTop]);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).closest(".window-controls")) return;
-    if (isMaximized) return;
-    onFocus();
-    setIsDragging(true);
-    setDragOffset({
-      x: e.clientX - position.x,
-      y: e.clientY - position.y,
-    });
-  }, [isMaximized, onFocus, position.x, position.y]);
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      if ((e.target as HTMLElement).closest(".window-action-btn")) return;
+      if (fillScreen) return;
+      onFocus();
+      setIsDragging(true);
+      setDragOffset({
+        x: e.clientX - position.x,
+        y: e.clientY - position.y,
+      });
+    },
+    [fillScreen, onFocus, position.x, position.y]
+  );
 
-  // Touch handling for mobile drag
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    if ((e.target as HTMLElement).closest(".window-controls")) return;
-    if (isMaximized || isMobile) return;
-    onFocus();
-    const touch = e.touches[0];
-    setIsDragging(true);
-    setDragOffset({
-      x: touch.clientX - position.x,
-      y: touch.clientY - position.y,
-    });
-  }, [isMaximized, isMobile, onFocus, position.x, position.y]);
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if ((e.target as HTMLElement).closest(".window-action-btn")) return;
+      if (fillScreen || isMobile) return;
+      onFocus();
+      const touch = e.touches[0];
+      setIsDragging(true);
+      setDragOffset({
+        x: touch.clientX - position.x,
+        y: touch.clientY - position.y,
+      });
+    },
+    [fillScreen, isMobile, onFocus, position.x, position.y]
+  );
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging || isMaximized) return;
+      if (!isDragging || fillScreen) return;
       setPosition({
         x: Math.max(0, Math.min(e.clientX - dragOffset.x, window.innerWidth - 200)),
-        y: Math.max(0, Math.min(e.clientY - dragOffset.y, window.innerHeight - 100)),
+        y: Math.max(
+          chromeTop,
+          Math.min(e.clientY - dragOffset.y, window.innerHeight - TASKBAR_HEIGHT - 80)
+        ),
       });
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (!isDragging || isMaximized) return;
+      if (!isDragging || fillScreen) return;
       const touch = e.touches[0];
       setPosition({
         x: Math.max(0, Math.min(touch.clientX - dragOffset.x, window.innerWidth - 200)),
-        y: Math.max(0, Math.min(touch.clientY - dragOffset.y, window.innerHeight - 100)),
+        y: Math.max(
+          chromeTop,
+          Math.min(touch.clientY - dragOffset.y, window.innerHeight - TASKBAR_HEIGHT - 80)
+        ),
       });
     };
 
-    const handleEnd = () => {
-      setIsDragging(false);
-    };
+    const handleEnd = () => setIsDragging(false);
 
     if (isDragging) {
       document.addEventListener("mousemove", handleMouseMove);
@@ -148,100 +187,122 @@ export const Window = React.memo(function Window({
       document.removeEventListener("touchmove", handleTouchMove);
       document.removeEventListener("touchend", handleEnd);
     };
-  }, [isDragging, dragOffset, isMaximized]);
+  }, [isDragging, dragOffset, fillScreen, chromeTop]);
 
-  const handleMaximize = useCallback(() => {
-    if (!isMobile) {
-      setIsMaximized(!isMaximized);
-    }
-    onFocus();
-  }, [isMobile, isMaximized, onFocus]);
+  const handleMaximize = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (!isMobile) onToggleMaximize();
+      onFocus();
+    },
+    [isMobile, onToggleMaximize, onFocus]
+  );
 
   if (!isReady) return null;
+
+  const fullscreenStyle: React.CSSProperties = {
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: TASKBAR_HEIGHT,
+  };
 
   return (
     <AnimatePresence>
       {!isMinimized && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          role="dialog"
+          aria-labelledby={`window-title-${id}`}
+          initial={{ opacity: 0, scale: 0.96, y: 16 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          className={`fixed flex flex-col overflow-hidden bg-os-window border border-black/10 dark:border-white/10 shadow-2xl ${
-            isMaximized ? "rounded-none" : "rounded-lg"
-          }`}
+          exit={{ opacity: 0, scale: 0.96, y: 16, transition: { duration: 0.12 } }}
+          transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
+          className={`fixed flex flex-col overflow-hidden shadow-[var(--os-window-shadow)] ${
+            fillScreen ? "rounded-none" : "rounded-2xl"
+          } ${isActive ? "ring-1 ring-[var(--os-accent)]/35" : ""}`}
           style={{
-            ...(isMaximized
-              ? { top: 0, left: 0, right: 0, bottom: 48, width: "100%", height: "calc(100% - 48px)" }
-              : { top: position.y, left: position.x, width: windowSize.width, height: windowSize.height }
-            ),
-            zIndex,
-            opacity: 1,
-            // Solid background with theme-aware shadow
-            boxShadow: "var(--os-window-shadow)",
+            ...(fillScreen
+              ? fullscreenStyle
+              : {
+                  top: position.y,
+                  left: position.x,
+                  width: windowSize.width,
+                  height: windowSize.height,
+                }),
+            zIndex: stackZ,
+            background: "var(--os-window)",
+            border: "1px solid var(--os-window-border)",
           }}
           onClick={onFocus}
         >
-          {/* Window Background - Solid, no transparency */}
-          <div className="absolute inset-0 bg-os-window -z-10" />
+          {isActive && (
+            <div
+              className="pointer-events-none absolute -inset-px -z-10 rounded-2xl opacity-60 blur-2xl"
+              style={{ background: "var(--os-accent-glow)" }}
+            />
+          )}
 
-          {/* Title Bar - Windows 11 style */}
           <div
-            className={`relative flex items-center justify-between h-10 px-3 select-none transition-colors ${
-              !isMaximized && !isMobile ? "cursor-move" : ""
-            } bg-os-window-header`}
+            className={`window-title-bar relative flex h-12 shrink-0 items-center gap-2 border-b border-[var(--os-border)] pl-3 pr-2 md:pl-4 md:pr-3 ${
+              !fillScreen && !isMobile ? "cursor-move" : ""
+            }`}
+            style={{ background: "var(--os-window-header)" }}
             onMouseDown={handleMouseDown}
             onTouchStart={handleTouchStart}
           >
-            {/* Window Icon and Title */}
-            <div className="flex items-center gap-2 text-sm text-[var(--os-window-text)]">
-              <span className="text-[var(--os-cyan)]">{WINDOW_ICONS[id]}</span>
-              <span className="font-medium">{title}</span>
+            <div className="flex min-w-0 flex-1 items-center gap-2.5">
+              <span
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[var(--os-accent)]"
+                style={{ background: "var(--os-accent-muted)" }}
+              >
+                {WINDOW_ICONS[id]}
+              </span>
+              <span
+                id={`window-title-${id}`}
+                className="truncate text-sm font-semibold text-[var(--os-text-primary)]"
+              >
+                {title}
+              </span>
             </div>
 
-            {/* Window Controls - Windows 11 style */}
-            <div className="window-controls flex items-center h-full -mr-3">
-              <button
-                onClick={(e) => { e.stopPropagation(); onMinimize(); }}
-                className="w-12 h-full flex items-center justify-center hover:bg-os-window-header transition-colors"
-                title="Minimize"
+            <div className="flex shrink-0 items-center gap-0.5">
+              <WindowActionButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMinimize();
+                }}
+                label="Minimize window"
               >
-                <svg className="w-4 h-4 text-[var(--os-window-text)] opacity-80" viewBox="0 0 12 12">
-                  <rect x="2" y="5.5" width="8" height="1" fill="currentColor" />
-                </svg>
-              </button>
+                <Minus className="h-4 w-4" />
+              </WindowActionButton>
+
               {!isMobile && (
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleMaximize(); }}
-                    className="w-12 h-full flex items-center justify-center hover:bg-foreground/10 transition-colors"
-                    title={isMaximized ? "Restore" : "Maximize"}
-                  >
-                    {isMaximized ? (
-                      <svg className="w-4 h-4 text-[var(--os-window-text)] opacity-80" viewBox="0 0 12 12">
-                        <rect x="2.5" y="4" width="6" height="5.5" fill="none" stroke="currentColor" strokeWidth="1" />
-                        <path d="M4.5 4V2.5h6V8h-1.5" fill="none" stroke="currentColor" strokeWidth="1" />
-                      </svg>
-                    ) : (
-                      <svg className="w-4 h-4 text-[var(--os-window-text)] opacity-80" viewBox="0 0 12 12">
-                        <rect x="2" y="2" width="8" height="8" fill="none" stroke="currentColor" strokeWidth="1" />
-                      </svg>
-                    )}
-                  </button>
+                <WindowActionButton
+                  onClick={handleMaximize}
+                  label={isMaximized ? "Restore window" : "Maximize window"}
+                >
+                  {isMaximized ? (
+                    <Copy className="h-3.5 w-3.5" />
+                  ) : (
+                    <Square className="h-3.5 w-3.5" />
+                  )}
+                </WindowActionButton>
               )}
-              <button
-                onClick={(e) => { e.stopPropagation(); onClose(); }}
-                className="w-12 h-full flex items-center justify-center hover:bg-[#c42b1c] transition-colors group"
-                title="Close"
+
+              <WindowActionButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClose();
+                }}
+                label="Close window"
+                variant="close"
               >
-                <svg className="w-4 h-4 text-[var(--os-window-text)] opacity-80 group-hover:text-white" viewBox="0 0 12 12">
-                  <path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" strokeWidth="1.2" />
-                </svg>
-              </button>
+                <X className="h-4 w-4" strokeWidth={2.5} />
+              </WindowActionButton>
             </div>
           </div>
 
-          {/* Content - Solid background from theme */}
-          <div className="relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-os-window">
+          <div className="os-scrollbar relative min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
             {children}
           </div>
         </motion.div>

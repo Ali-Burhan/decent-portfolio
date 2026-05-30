@@ -6,6 +6,7 @@ import { Section } from "@/components/section";
 import portfolioData from "@/data/portfolio.json";
 import { useI18n } from "@/lib/i18n";
 import { Nav } from "@/components/nav";
+import { SiteFooter } from "@/components/site-footer";
 
 export function ExperienceContent() {
   const { experience } = portfolioData;
@@ -151,6 +152,7 @@ export function ExperienceContent() {
           </div>
         </Section>
       </main>
+      <SiteFooter />
     </div>
   );
 }

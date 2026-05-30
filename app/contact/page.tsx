@@ -4,7 +4,7 @@ import { ContactContent } from "@/components/contact-content";
 export const metadata: Metadata = {
   title: "Contact | Ali Burhan - Let's Build Together",
   description:
-    "Get in touch with Ali Burhan, Full Stack Developer & Architect. Available for projects in Next.js, React, Python, AWS & AI. Email: aliburhan.dev.ai@gmail.com | Lahore, Pakistan",
+    "Get in touch with Ali Burhan, Full Stack Engineer. Available for projects in Next.js, React, Python, AWS & AI. Email: aliburhan.dev.ai@gmail.com | Lahore, Pakistan",
   keywords: [
     "Contact Ali Burhan",
     "Hire Full Stack Developer",
@@ -14,16 +14,16 @@ export const metadata: Metadata = {
     "Hire AI Engineer",
     "Software Engineer for Hire",
     "Freelance Developer Pakistan",
-    "Contact Full Stack Architect",
+    "Contact Full Stack Engineer",
   ],
   authors: [{ name: "Ali Burhan", url: "https://aliburhan.com" }],
   alternates: {
     canonical: "https://aliburhan.com/contact",
   },
   openGraph: {
-    title: "Contact Ali Burhan - Full Stack Developer & Architect",
+    title: "Contact Ali Burhan - Full Stack Engineer",
     description:
-      "Get in touch with Ali Burhan, Full Stack Developer & Architect. Available for projects in Next.js, React, Python, AWS & AI.",
+      "Get in touch with Ali Burhan, Full Stack Engineer. Available for projects in Next.js, React, Python, AWS & AI.",
     url: "https://aliburhan.com/contact",
     type: "website",
     images: ["/og-image.png"],
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Contact Ali Burhan - Full Stack Developer",
     description:
-      "Get in touch with Ali Burhan, Full Stack Developer & Architect. Available for projects in Next.js, React, Python, AWS & AI.",
+      "Get in touch with Ali Burhan, Full Stack Engineer. Available for projects in Next.js, React, Python, AWS & AI.",
     images: ["/og-image.png"],
   },
 };
@@ -44,7 +44,7 @@ export default function ContactPage() {
     mainEntity: {
       "@type": "Person",
       name: "Ali Burhan",
-      jobTitle: "Full Stack Developer & Architect",
+      jobTitle: "Full Stack Engineer",
       email: "aliburhan.dev.ai@gmail.com",
       telephone: "+92-300-1499488",
       url: "https://aliburhan.com",

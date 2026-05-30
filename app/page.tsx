@@ -1,15 +1,18 @@
 import { Metadata } from "next";
-import { Desktop } from "@/components/os";
+import { HomePageClient } from "@/components/home-page-client";
+import { SeoContent } from "@/components/seo-content";
+import { SITE_URL } from "@/lib/site";
+import portfolioData from "@/data/portfolio.json";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://aliburhan.com"),
-  title: "Ali Burhan | Full Stack Architect | Next.js • Python • AWS • AI",
+  title: "Ali Burhan | Full Stack Engineer | Next.js • Python • AWS • AI",
   description:
-    "Ali Burhan is a Full Stack Developer & Architect with 3+ years experience. Expert in Next.js, React, Python, AWS & AI. Building scalable solutions serving 1000+ sites globally from Lahore, Pakistan.",
+    "Ali Burhan is a Full Stack Engineer with 3+ years experience. Expert in Next.js, React, Python, AWS & AI. Building scalable solutions serving 1,000+ sites globally from Lahore, Pakistan.",
   keywords: [
     "Ali Burhan",
+    "Full Stack Engineer",
     "Full Stack Developer",
-    "Full Stack Architect",
     "Next.js Developer",
     "React Developer",
     "Python Developer",
@@ -18,12 +21,11 @@ export const metadata: Metadata = {
     "LangChain",
     "RAG Developer",
     "LLM Developer",
-    "Serverless Architect",
     "Software Engineer",
     "Lahore Developer",
     "Pakistan Developer",
     "Web Developer",
-    "Cloud Architect",
+    "Cloud Engineer",
   ],
   authors: [{ name: "Ali Burhan", url: "https://aliburhan.com" }],
   creator: "Ali Burhan",
@@ -36,27 +38,17 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://aliburhan.com",
     siteName: "Ali Burhan Portfolio",
-    title: "Ali Burhan | Full Stack Architect | Next.js • Python • AWS • AI",
+    title: "Ali Burhan | Full Stack Engineer | Next.js • Python • AWS • AI",
     description:
-      "Ali Burhan is a Full Stack Developer & Architect with 3+ years experience. Expert in Next.js, React, Python, AWS & AI. Building scalable solutions serving 1000+ sites globally.",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Ali Burhan - Full Stack Developer & Architect Portfolio",
-        type: "image/png",
-      },
-    ],
+      "Ali Burhan is a Full Stack Engineer with 3+ years experience. Expert in Next.js, React, Python, AWS & AI. Building scalable solutions serving 1,000+ sites globally.",
   },
   twitter: {
     card: "summary_large_image",
     site: "@aliburhan_dev",
     creator: "@aliburhan_dev",
-    title: "Ali Burhan | Full Stack Architect | Next.js • Python • AWS • AI",
+    title: "Ali Burhan | Full Stack Engineer | Next.js • Python • AWS • AI",
     description:
-      "Ali Burhan is a Full Stack Developer & Architect with 3+ years experience. Expert in Next.js, React, Python, AWS & AI.",
-    images: ["/og-image.png"],
+      "Ali Burhan is a Full Stack Engineer with 3+ years experience. Expert in Next.js, React, Python, AWS & AI.",
   },
   robots: {
     index: true,
@@ -72,13 +64,15 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  const jsonLd = {
+  const { personalInfo, socialLinks } = portfolioData;
+
+  const personJsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
-    name: "Ali Burhan",
-    url: "https://aliofficial.vercel.app",
-    image: "https://aliofficial.vercel.app/ali-pic.png",
-    jobTitle: "Full Stack Architect",
+    name: personalInfo.name,
+    url: SITE_URL,
+    image: `${SITE_URL}/opengraph-image`,
+    jobTitle: personalInfo.role,
     worksFor: {
       "@type": "Organization",
       name: "Hashlogics",
@@ -88,12 +82,9 @@ export default function Home() {
       addressLocality: "Lahore",
       addressCountry: "Pakistan",
     },
-    email: "aliburhan.dev.ai@gmail.com",
-    telephone: "+92-300-1499488",
-    sameAs: [
-      "https://github.com/Ali-Burhan",
-      "https://www.linkedin.com/in/ali-burhan-9076b42b6/",
-    ],
+    email: personalInfo.email,
+    telephone: personalInfo.phone.replace(/\s/g, ""),
+    sameAs: [socialLinks.github, socialLinks.linkedin, SITE_URL],
     knowsAbout: [
       "Next.js",
       "React",
@@ -104,35 +95,41 @@ export default function Home() {
       "Full Stack Development",
       "Cloud Architecture",
     ],
-    description:
-      "Ali Burhan is a Full Stack Developer specializing in Next.js, React, Python, AWS, and AI-powered applications. Building scalable web applications and enterprise solutions.",
+    description: personalInfo.description,
     alumniOf: {
       "@type": "EducationalOrganization",
       name: "University of Engineering and Technology (UET) Lahore",
     },
   };
 
+  const professionalJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    name: `${personalInfo.name} — ${personalInfo.role}`,
+    url: SITE_URL,
+    description: personalInfo.description,
+    areaServed: "Worldwide",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: personalInfo.location,
+      addressCountry: "PK",
+    },
+    email: personalInfo.email,
+    telephone: personalInfo.phone.replace(/\s/g, ""),
+  };
+
   const webSiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "Ali Burhan Portfolio",
-    url: "https://aliburhan.com",
-    description: "Full Stack Developer & Architect specializing in Next.js, React, Python, AWS & AI",
-    potentialAction: {
-      "@type": "SearchAction",
-      target: "https://aliburhan.com/search?q={search_term_string}",
-      "query-input": "required name=search_term_string",
-    },
+    url: SITE_URL,
+    description:
+      "Full Stack Engineer specializing in Next.js, React, Python, AWS & AI",
+    inLanguage: ["en", "es", "fr"],
     publisher: {
-      "@type": "Organization",
-      name: "Ali Burhan",
-      url: "https://aliburhan.com",
-      logo: {
-        "@type": "ImageObject",
-        url: "https://aliburhan.com/og-image.png",
-        width: 1200,
-        height: 630,
-      },
+      "@type": "Person",
+      name: personalInfo.name,
+      url: SITE_URL,
     },
   };
 
@@ -144,7 +141,7 @@ export default function Home() {
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://aliburhan.com",
+        item: SITE_URL,
       },
     ],
   };
@@ -157,13 +154,18 @@ export default function Home() {
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(professionalJsonLd) }}
       />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <Desktop />
+      <SeoContent />
+      <HomePageClient />
     </>
   );
 }

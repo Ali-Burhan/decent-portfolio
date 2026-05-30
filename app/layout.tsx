@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { LangInit } from "@/components/lang-init";
 import { I18nProvider } from "@/lib/i18n";
+import { ViewModeProvider } from "@/lib/view-mode";
+import { parseLocaleCookie } from "@/lib/i18n-messages";
+import { SITE_URL } from "@/lib/site";
 import { WebVitals } from "@/components/web-vitals";
 import { CursorCleanup } from "@/components/cursor-cleanup";
 
@@ -17,17 +22,17 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://aliburhan.com"),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Ali Burhan - Full Stack Developer | Next.js • Python • AWS • AI",
+    default: "Ali Burhan - Full Stack Engineer | Next.js • Python • AWS • AI",
     template: "%s | Ali Burhan",
   },
   description:
-    "Ali Burhan - Full Stack Developer & Architect specializing in Next.js, React, Python, AWS & AI. Building scalable cloud-native solutions serving 1000+ sites globally. Based in Lahore, Pakistan.",
+    "Ali Burhan - Full Stack Engineer specializing in Next.js, React, Python, AWS & AI. Building scalable cloud-native solutions serving 1,000+ sites globally. Based in Lahore, Pakistan.",
   keywords: [
     "Ali Burhan",
+    "Full Stack Engineer",
     "Full Stack Developer",
-    "Full Stack Architect",
     "Next.js Developer",
     "React Developer",
     "Python Developer",
@@ -38,13 +43,12 @@ export const metadata: Metadata = {
     "Software Engineer",
     "Lahore Developer",
     "Pakistan Developer",
-    "Serverless Architect",
     "Cloud Engineer",
     "LLM Developer",
     "RAG Developer",
     "Full Stack Pakistan",
   ],
-  authors: [{ name: "Ali Burhan", url: "https://aliburhan.com" }],
+  authors: [{ name: "Ali Burhan", url: SITE_URL }],
   creator: "Ali Burhan",
   publisher: "Ali Burhan",
   category: "Technology",
@@ -52,20 +56,11 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     alternateLocale: ["es_ES", "fr_FR"],
-    url: "https://aliburhan.com",
+    url: SITE_URL,
     siteName: "Ali Burhan Portfolio",
-    title: "Ali Burhan - Full Stack Developer | Next.js • Python • AWS • AI",
+    title: "Ali Burhan - Full Stack Engineer | Next.js • Python • AWS • AI",
     description:
-      "Ali Burhan is a Full Stack Developer & Architect specializing in Next.js, React, Python, AWS & AI. Building scalable cloud-native solutions serving 1000+ sites globally.",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Ali Burhan - Full Stack Developer & Architect",
-        type: "image/png",
-      },
-    ],
+      "Ali Burhan is a Full Stack Engineer specializing in Next.js, React, Python, AWS & AI. Building scalable cloud-native solutions serving 1,000+ sites globally.",
   },
   twitter: {
     card: "summary_large_image",
@@ -73,8 +68,7 @@ export const metadata: Metadata = {
     creator: "@aliburhan_dev",
     title: "Ali Burhan - Full Stack Developer | Next.js • Python • AWS • AI",
     description:
-      "Full Stack Developer & Architect specializing in Next.js, React, Python, AWS & AI. Building scalable cloud-native solutions.",
-    images: ["/og-image.png"],
+      "Full Stack Engineer specializing in Next.js, React, Python, AWS & AI. Building scalable cloud-native solutions.",
   },
   robots: {
     index: true,
@@ -91,17 +85,25 @@ export const metadata: Metadata = {
     google: process.env.GOOGLE_SITE_VERIFICATION || "",
   },
   alternates: {
-    canonical: "https://aliburhan.com",
+    canonical: SITE_URL,
+    languages: {
+      en: SITE_URL,
+      es: SITE_URL,
+      fr: SITE_URL,
+    },
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const initialLocale = parseLocaleCookie(cookieStore.get("locale")?.value);
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={initialLocale} suppressHydrationWarning>
       <body
         className={`${inter.variable} antialiased`}
       >
@@ -111,10 +113,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <I18nProvider>
-            <WebVitals />
-            <CursorCleanup />
-            {children}
+          <I18nProvider initialLocale={initialLocale}>
+            <ViewModeProvider>
+              <LangInit />
+              <WebVitals />
+              <CursorCleanup />
+              {children}
+            </ViewModeProvider>
           </I18nProvider>
         </ThemeProvider>
       </body>

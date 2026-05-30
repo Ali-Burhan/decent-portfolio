@@ -1,10 +1,15 @@
 "use client";
-import React, { useState, useCallback, useEffect, lazy, Suspense } from "react";
+import React, { useState, useCallback, useEffect, useLayoutEffect, lazy, Suspense } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Taskbar } from "./taskbar";
 import { DesktopIcon } from "./desktop-icon";
 import { Window } from "./window";
+import { RecruiterHero } from "./recruiter-hero";
 import portfolioData from "@/data/portfolio.json";
+import { RESUME_FILENAME, RESUME_PATH, PROFILE_IMAGE } from "@/lib/site";
+import { OS_Z, nextWindowZIndex } from "@/lib/os-layers";
+import { FeaturedProjectsRow } from "@/components/featured-projects-row";
 
 // Lazy load window content for better performance
 const AboutContent = lazy(() => import("./windows/about-content").then(m => ({ default: m.AboutContent })));
@@ -17,6 +22,7 @@ export type WindowId = "about" | "projects" | "experience" | "contact";
 interface WindowState {
   id: WindowId;
   isMinimized: boolean;
+  isMaximized: boolean;
   zIndex: number;
 }
 
@@ -30,6 +36,7 @@ const DESKTOP_ICONS: { id: WindowId; label: string; icon: string }[] = [
 const QUICK_LINKS = [
   { id: "github", label: "GitHub", icon: "github", url: portfolioData.socialLinks.github },
   { id: "linkedin", label: "LinkedIn", icon: "linkedin", url: portfolioData.socialLinks.linkedin },
+  { id: "resume", label: "Resume", icon: "resume", url: RESUME_PATH, download: true },
 ];
 
 export function Desktop() {
@@ -44,6 +51,39 @@ export function Desktop() {
   const [isMobile, setIsMobile] = useState(false);
   const [currentTime, setCurrentTime] = useState("");
   const [reduceMotion, setReduceMotion] = useState(false);
+  const [heroCollapsed, setHeroCollapsed] = useState(false);
+  const heroRef = React.useRef<HTMLElement>(null);
+  const [navbarHeight, setNavbarHeight] = useState(96);
+
+  const hideNavbar = windows.some((w) => !w.isMinimized && w.isMaximized);
+
+  const measureNavbar = useCallback(() => {
+    const el = heroRef.current;
+    if (!el) return;
+    const height = el.offsetHeight;
+    if (height < 48) return;
+    setNavbarHeight(Math.min(280, Math.max(72, height + 8)));
+  }, []);
+
+  useLayoutEffect(() => {
+    if (hideNavbar) return;
+    measureNavbar();
+    const raf = requestAnimationFrame(measureNavbar);
+    return () => cancelAnimationFrame(raf);
+  }, [heroCollapsed, hideNavbar, measureNavbar]);
+
+  useEffect(() => {
+    if (hideNavbar) return;
+    const el = heroRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(measureNavbar);
+    observer.observe(el);
+    window.addEventListener("resize", measureNavbar);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measureNavbar);
+    };
+  }, [heroCollapsed, hideNavbar, measureNavbar]);
 
   // Check for mobile and prefers-reduced-motion
   useEffect(() => {
@@ -80,19 +120,34 @@ export function Desktop() {
   }, []);
 
   const openWindow = useCallback((id: WindowId) => {
+    const maximizedOnOpen = typeof window !== "undefined" && window.innerWidth < 768;
+    const nextZ = nextWindowZIndex(highestZ);
     setWindows((prev) => {
       const exists = prev.find((w) => w.id === id);
       if (exists) {
         return prev.map((w) =>
-          w.id === id ? { ...w, isMinimized: false, zIndex: highestZ + 1 } : w
+          w.id === id ? { ...w, isMinimized: false, zIndex: nextZ } : w
         );
       }
-      return [...prev, { id, isMinimized: false, zIndex: highestZ + 1 }];
+      return [
+        ...prev,
+        { id, isMinimized: false, isMaximized: maximizedOnOpen, zIndex: nextZ },
+      ];
     });
-    setHighestZ((z) => z + 1);
+    setHighestZ(nextZ);
     setActiveWindow(id);
     setShowStartMenu(false);
   }, [highestZ]);
+
+  const toggleMaximizeWindow = useCallback(
+    (id: WindowId) => {
+      setWindows((prev) =>
+        prev.map((w) => (w.id === id ? { ...w, isMaximized: !w.isMaximized } : w))
+      );
+      setActiveWindow(id);
+    },
+    []
+  );
 
   const closeWindow = useCallback((id: WindowId) => {
     setWindows((prev) => prev.filter((w) => w.id !== id));
@@ -107,22 +162,24 @@ export function Desktop() {
   }, []);
 
   const focusWindow = useCallback((id: WindowId) => {
+    const nextZ = nextWindowZIndex(highestZ);
     setWindows((prev) =>
-      prev.map((w) => (w.id === id ? { ...w, zIndex: highestZ + 1 } : w))
+      prev.map((w) => (w.id === id ? { ...w, zIndex: nextZ } : w))
     );
-    setHighestZ((z) => z + 1);
+    setHighestZ(nextZ);
     setActiveWindow(id);
   }, [highestZ]);
 
   const handleTaskbarWindowClick = useCallback((id: WindowId) => {
     const window = windows.find((w) => w.id === id);
     if (window?.isMinimized) {
+      const nextZ = nextWindowZIndex(highestZ);
       setWindows((prev) =>
         prev.map((w) =>
-          w.id === id ? { ...w, isMinimized: false, zIndex: highestZ + 1 } : w
+          w.id === id ? { ...w, isMinimized: false, zIndex: nextZ } : w
         )
       );
-      setHighestZ((z) => z + 1);
+      setHighestZ(nextZ);
       setActiveWindow(id);
     } else if (activeWindow === id) {
       minimizeWindow(id);
@@ -165,8 +222,18 @@ export function Desktop() {
     return titles[id] || id;
   };
 
-  const openExternalLink = (url: string) => {
-    window.open(url, "_blank", "noopener,noreferrer");
+  const openExternalLink = (url: string, download?: boolean) => {
+    if (download) {
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = RESUME_FILENAME;
+      link.rel = "noopener noreferrer";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
     setShowStartMenu(false);
   };
 
@@ -231,11 +298,43 @@ export function Desktop() {
     setSearchResults([]);
   };
 
+  const openAllSections = useCallback(() => {
+    const ids: WindowId[] = ["about", "projects", "experience", "contact"];
+    const maximizedOnOpen = typeof window !== "undefined" && window.innerWidth < 768;
+    setWindows((prev) => {
+      const next = [...prev];
+      let z = highestZ;
+      for (const id of ids) {
+        const exists = next.find((w) => w.id === id);
+        z = nextWindowZIndex(z);
+        if (exists) {
+          const idx = next.findIndex((w) => w.id === id);
+          next[idx] = { ...next[idx], isMinimized: false, zIndex: z };
+        } else {
+          next.push({
+            id,
+            isMinimized: false,
+            isMaximized: maximizedOnOpen,
+            zIndex: z,
+          });
+        }
+      }
+      return next;
+    });
+    setHighestZ((z) => {
+      let current = z;
+      for (let i = 0; i < ids.length; i++) current = nextWindowZIndex(current);
+      return current;
+    });
+    setActiveWindow("projects");
+    setShowStartMenu(false);
+  }, [highestZ]);
+
   return (
     <div 
       className="fixed inset-0 overflow-hidden select-none transition-all duration-500"
       style={{
-        filter: `brightness(${brightness}%) ${nightLight ? 'sepia(30%) saturate(120%) hue-rotate(-15deg)' : ''}`
+        filter: `brightness(${brightness}%) ${nightLight ? 'sepia(30%) saturate(120%) hue-rotate(-15deg)' : ''}`,
       }}
     >
       {/* Professional Mesh Gradient Background - Optimized */}
@@ -249,7 +348,7 @@ export function Desktop() {
             scale: [1, 1.15, 1],
           }}
           transition={reduceMotion ? {} : { duration: 30, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-1/4 -left-1/4 w-full h-full rounded-full bg-[#38bdf8]/15 blur-[120px]"
+          className="absolute -top-1/4 -left-1/4 w-full h-full rounded-full bg-[var(--os-accent)]/12 blur-[120px]"
           style={{ willChange: reduceMotion ? 'auto' : 'transform' }}
         />
         <motion.div
@@ -257,7 +356,7 @@ export function Desktop() {
             scale: [1, 1.1, 1],
           }}
           transition={reduceMotion ? {} : { duration: 35, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute -bottom-1/4 -right-1/4 w-full h-full rounded-full bg-[#818cf8]/12 blur-[100px]"
+          className="absolute -bottom-1/4 -right-1/4 w-full h-full rounded-full bg-indigo-500/10 blur-[100px]"
           style={{ willChange: reduceMotion ? 'auto' : 'transform' }}
         />
 
@@ -265,8 +364,11 @@ export function Desktop() {
         <div className="absolute inset-0 bg-background/5 backdrop-blur-[1px]" />
       </div>
 
-      {/* Desktop Icons - Responsive grid */}
-      <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10">
+      {/* Desktop Icons — always below recruiter navbar */}
+      <div
+        className="absolute left-4 md:left-6 z-[5] pointer-events-auto"
+        style={{ top: hideNavbar ? 16 : navbarHeight + 12 }}
+      >
         <div className="grid grid-cols-2 md:grid-cols-1 gap-1 md:gap-2">
           {DESKTOP_ICONS.map((item) => (
             <DesktopIcon
@@ -282,7 +384,8 @@ export function Desktop() {
               key={item.id}
               icon={item.icon}
               label={item.label}
-              onClick={() => openExternalLink(item.url)}
+              singleClick={"download" in item}
+              onClick={() => openExternalLink(item.url, "download" in item && item.download)}
             />
           ))}
         </div>
@@ -290,24 +393,30 @@ export function Desktop() {
 
       {/* Center Welcome Widget - Windows 11 style */}
       {windows.length === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none pb-16">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none pb-16 pt-24 md:pt-28">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="text-center space-y-4 md:space-y-6 px-4"
           >
-            {/* Profile Avatar */}
+            {/* Profile — desktop “account” avatar (like a lock screen) */}
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={reduceMotion ? { duration: 0 } : { duration: 0.8, delay: 0.2, type: "spring" }}
-              className="mx-auto w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-[#38bdf8] via-[#818cf8] to-[#c084fc] p-[2px] shadow-2xl shadow-indigo-500/20"
+              className="relative mx-auto h-24 w-24 rounded-full bg-gradient-to-br from-[var(--os-accent)] via-indigo-400 to-violet-400 p-[3px] shadow-2xl md:h-32 md:w-32"
+              style={{ boxShadow: "0 20px 40px var(--os-accent-glow)" }}
             >
-              <div className="w-full h-full rounded-full bg-[#0f172a] flex items-center justify-center border-4 border-[#1e293b] overflow-hidden">
-                <span className="text-4xl md:text-6xl font-black bg-gradient-to-br from-[#38bdf8] to-[#c084fc] bg-clip-text text-transparent drop-shadow-sm">
-                  {personalInfo.name.charAt(0)}
-                </span>
+              <div className="relative h-full w-full overflow-hidden rounded-full border-2 border-[var(--os-window)] bg-[var(--os-surface)]">
+                <Image
+                  src={PROFILE_IMAGE}
+                  alt={personalInfo.name}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 96px, 128px"
+                  priority
+                />
               </div>
             </motion.div>
 
@@ -316,7 +425,7 @@ export function Desktop() {
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-os-text-primary tracking-tighter transition-colors drop-shadow-sm">
                 {personalInfo.name}
               </h1>
-              <div className="h-1 w-20 mx-auto bg-gradient-to-r from-transparent via-[#38bdf8] to-transparent opacity-50" />
+              <div className="mx-auto h-px w-20 bg-gradient-to-r from-transparent via-[var(--os-accent)] to-transparent opacity-60" />
               <p className="text-lg md:text-xl lg:text-2xl text-os-text-secondary font-medium tracking-wide uppercase opacity-80">
                 {personalInfo.role.split("|")[0].trim()}
               </p>
@@ -376,30 +485,92 @@ export function Desktop() {
               </div>
             </motion.div>
 
-            {/* Hint */}
+            {/* Quick actions */}
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={reduceMotion ? { duration: 0 } : { delay: 1 }}
+              className="flex flex-wrap justify-center gap-3 mt-6 pointer-events-auto"
+            >
+              <button
+                type="button"
+                onClick={() => openWindow("projects")}
+                className="rounded-full border border-[var(--os-accent)]/35 bg-[var(--os-accent-muted)] px-5 py-2.5 text-sm font-semibold text-[var(--os-text-primary)] transition-colors hover:border-[var(--os-accent)]/50"
+              >
+                View projects
+              </button>
+              <a
+                href={RESUME_PATH}
+                download={RESUME_FILENAME}
+                className="px-6 py-3 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-sm font-semibold hover:bg-emerald-500/25 transition-colors inline-flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Download resume
+              </a>
+              <button
+                type="button"
+                onClick={() => openWindow("contact")}
+                className="rounded-full border border-sky-400/40 bg-sky-500/20 px-5 py-2.5 text-sm font-semibold text-os-text-primary transition-colors hover:bg-sky-500/30"
+              >
+                Hire Me
+              </button>
+            </motion.div>
+
+            <FeaturedProjectsRow
+              variant="os"
+              onProjectClick={() => openWindow("projects")}
+            />
+
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={reduceMotion ? { duration: 0 } : { delay: 1.2 }}
-              className="text-[10px] md:text-xs text-os-text-secondary opacity-40 mt-8 transition-colors italic"
+              className="text-[10px] md:text-xs text-os-text-secondary opacity-40 mt-6 transition-colors italic"
             >
-              Explore my work via the taskbar or desktop icons
+              Tap a preview or folder icon to explore — switch to Recruiter View for the full scroll layout
             </motion.p>
           </motion.div>
         </div>
       )}
 
-      {/* Windows */}
+      <AnimatePresence>
+        {!hideNavbar && (
+          <motion.div
+            key="recruiter-hero"
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.2 }}
+            className="fixed top-0 left-0 right-0 isolate"
+            style={{ zIndex: OS_Z.navbar }}
+          >
+            <RecruiterHero
+              ref={heroRef}
+              collapsed={heroCollapsed}
+              onToggleCollapse={() => setHeroCollapsed((c) => !c)}
+              onContact={() => openWindow("contact")}
+              onOpenProjects={openAllSections}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Windows — stack below navbar (z capped in window.tsx) */}
       {windows.map((window) => (
         <Window
           key={window.id}
           id={window.id}
           title={getWindowTitle(window.id)}
           isMinimized={window.isMinimized}
+          isMaximized={window.isMaximized}
           zIndex={window.zIndex}
+          topInset={navbarHeight}
           isActive={activeWindow === window.id}
           onClose={() => closeWindow(window.id)}
           onMinimize={() => minimizeWindow(window.id)}
+          onToggleMaximize={() => toggleMaximizeWindow(window.id)}
           onFocus={() => focusWindow(window.id)}
         >
           {getWindowContent(window.id)}
@@ -416,7 +587,8 @@ export function Desktop() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className="fixed inset-0 z-40"
+              className="fixed inset-0"
+              style={{ zIndex: OS_Z.startBackdrop }}
               onClick={() => setShowStartMenu(false)}
             />
 
@@ -426,12 +598,13 @@ export function Desktop() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.98 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className={`fixed z-50 ${
+              className={`fixed ${
                 isMobile
                   ? "bottom-14 left-2 right-2"
                   : "bottom-14 left-1/2 -translate-x-1/2"
               }`}
               style={{
+                zIndex: OS_Z.startMenu,
                 width: isMobile ? "auto" : "600px",
                 maxWidth: "calc(100vw - 16px)",
               }}
@@ -452,10 +625,11 @@ export function Desktop() {
                       </svg>
                       <input
                         ref={searchInputRef}
-                        type="text"
+                        type="search"
                         value={searchQuery}
                         onChange={(e) => handleSearch(e.target.value)}
                         placeholder="Type to search content..."
+                        aria-label="Search portfolio sections"
                         className="w-full bg-transparent border-none outline-none text-sm text-os-text-primary placeholder:text-os-text-secondary"
                       />
                     </div>
@@ -515,8 +689,9 @@ export function Desktop() {
                         {QUICK_LINKS.map((item) => (
                           <button
                             key={item.id}
-                            onClick={() => openExternalLink(item.url)}
+                            onClick={() => openExternalLink(item.url, "download" in item && item.download)}
                             className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-foreground/5 transition-colors"
+                            aria-label={item.label}
                           >
                             <StartMenuIcon name={item.icon} />
                             <span className="text-[10px] md:text-xs text-os-text-primary text-center leading-tight">

@@ -1,18 +1,18 @@
 {
   "personalInfo": {
     "name": "Ali Burhan",
-    "role": "Full Stack Developer",
-    "description": "Full Stack Developer with 2+ years of experience building scalable cloud applications, AI-powered solutions, and microservices platforms using JavaScript (React, Next.js, Node.js), Python, and AWS cloud services. Specialized in serverless architectures (AWS Lambda, API Gateway, CloudFront), LLM integration (LangChain, RAG), and Infrastructure as Code with Terraform.",
+    "role": "Full Stack Engineer",
+    "description": "Full Stack Engineer with 3+ years of experience building scalable cloud applications, AI-powered solutions, and microservices platforms using JavaScript (React, Next.js, Node.js), Python, and AWS cloud services. Specialized in serverless architectures (AWS Lambda, API Gateway, CloudFront), LLM integration (LangChain, RAG), and Infrastructure as Code with Terraform.",
     "availability": "Available for new projects",
     "location": "Lahore, Pakistan",
     "phone": "+92 300 1499488",
     "email": "aliburhan.dev.ai@gmail.com",
-    "portfolio": "https://aliburhan.vercel.app"
+    "portfolio": "https://aliburhan.com"
   },
   "socialLinks": {
     "github": "https://github.com/Ali-Burhan",
-    "linkedin": "https://linkedin.com/in/ali-burhan-9076b42b6/",
-    "portfolio": "https://aliburhan.vercel.app"
+    "linkedin": "https://www.linkedin.com/in/ali-burhan-9076b42b6/",
+    "portfolio": "https://aliburhan.com"
   },
   "skills": {
     "frontend": ["React", "Next.js", "TypeScript", "Tailwind CSS", "Zustand", "React DnD", "JavaScript", "HTML/CSS"],
@@ -57,6 +57,7 @@
       "projects": [
         {
           "name": "Forwood Safety",
+          "slug": "forwood-safety",
           "duration": "Oct 2024 – Present",
           "url": "https://forwoodsafety.com",
           "description": "Built and maintained a microservices safety platform deployed across 1,000+ sites globally using Python serverless architecture, reducing infrastructure costs by 30%.",
@@ -70,6 +71,7 @@
         },
         {
           "name": "Lumaya",
+          "slug": "lumaya",
           "duration": "Nov 2024 – Mar 2025",
           "url": "https://lumaya.ch",
           "description": "Architected and delivered a full-stack business marketplace as sole developer in 4 months, 50+ listings worth $10M+ total value, from requirements through production.",
@@ -90,6 +92,7 @@
       "projects": [
         {
           "name": "CazVid",
+          "slug": "cazvid",
           "duration": "May 2024 – Oct 2024",
           "url": "https://cazvid.com",
           "description": "Built 25+ frontend components for an AI-driven job board serving 150+ languages globally, integrating 20+ RESTful APIs with NestJS/MongoDB backend.",
@@ -135,6 +138,8 @@
     },
     {
       "name": "TeachTrack AI",
+      "slug": "teachtrack-ai",
+      "url": null,
       "description": "Built an AI-powered educational platform automating test creation and grading for 500+ monthly assessments across 3 schools, serving 1,200+ students and 45+ teachers.",
       "achievements": [
         "Built AI-powered educational platform automating test creation and grading for 500+ monthly assessments across 3 schools, serving 1,200+ students and 45+ teachers",
@@ -162,9 +167,12 @@
     }
   ],
   "highlights": {
-    "yearsExperience": "2+",
+    "yearsExperience": "3+",
     "projectsCompleted": "6+",
     "technologies": "30+",
-    "sites": "1000+"
-  }
+    "sites": "1000+",
+    "infraCostReduction": "30%",
+    "deploymentTime": "15 min"
+  },
+  "testimonials": []
 }

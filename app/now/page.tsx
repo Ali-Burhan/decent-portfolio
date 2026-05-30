@@ -4,7 +4,7 @@ import { NowContent } from "@/components/now-content";
 export const metadata: Metadata = {
   title: "Now | Ali Burhan - What I'm Doing Now",
   description:
-    "What Ali Burhan is doing now: Pursuing Master's in CS at UET Lahore, building at Hashlogics, learning AWS CDK & LangChain, and working on side projects. Updated December 2025.",
+    "What Ali Burhan is doing now: Pursuing Master's in CS at UET Lahore, building at Hashlogics, learning AWS CDK & LangChain, and working on side projects. Updated May 2026.",
   keywords: [
     "Ali Burhan Now",
     "What I'm doing now",
@@ -42,7 +42,7 @@ const jsonLd = {
   headline: "What I'm Doing Now - Ali Burhan",
   description: "Current activities and projects of Ali Burhan including Master's at UET Lahore, work at Hashlogics, and side projects",
   datePublished: "2025-12-01",
-  dateModified: "2025-12-01",
+  dateModified: "2026-05-01",
   author: {
     "@type": "Person",
     name: "Ali Burhan",
