@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ProjectsContent } from "@/components/projects-content";
 
 export const metadata: Metadata = {
-  title: "Projects | Ali Burhan - Full Stack Developer Portfolio",
+  title: "Projects | Ali Burhan - Full Stack Engineer Portfolio",
   description:
     "Explore projects by Ali Burhan: Forwood Safety (1000+ sites), Lumaya marketplace, TeachTrack AI, Emotion-Aware Voice System, and CazVid. Built with Next.js, Python, AWS, LangChain & AI technologies.",
   keywords: [

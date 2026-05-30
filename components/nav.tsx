@@ -7,7 +7,10 @@ import { useTheme } from "next-themes";
 import { throttle } from "@/lib/utils";
 
 import { useI18n } from "@/lib/i18n";
+import { RESUME_FILENAME, RESUME_PATH } from "@/lib/site";
+import { portfolioCtaStyle } from "@/lib/portfolio-cta-styles";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { ViewModeToggle } from "@/components/view-mode-toggle";
 
 const accents = [
   { name: "Visionary", value: "visionary", color: "#FF6B6B" },
@@ -113,8 +116,6 @@ export function Nav() {
   const [mounted, setMounted] = useState(false);
   const [accentDropdownOpen, setAccentDropdownOpen] = useState(false);
   const [activeAccent, setActiveAccent] = useState("visionary");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showSearchResults, setShowSearchResults] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -125,7 +126,10 @@ export function Nav() {
     { name: t("nav.experience"), href: "/experience", sectionId: "experience" },
     { name: t("nav.projects"), href: "/projects", sectionId: "projects" },
     { name: t("nav.contact"), href: "/contact", sectionId: "contact" },
+    { name: t("nav.now"), href: "/now", sectionId: "now" },
   ];
+
+  const hireMeHref = pathname === "/" ? "#contact" : "/contact";
 
   // Determine active link based on pathname or scroll position (on homepage)
   const getActiveLink = () => {
@@ -173,56 +177,13 @@ export function Nav() {
     return () => window.removeEventListener("scroll", throttledScroll);
   }, [setTheme]);
 
-  // Scroll Spy - Track active section (only on homepage)
+  // Homepage uses OS desktop — no scroll sections; pathname drives active state
   useEffect(() => {
-    // Only enable scroll spy on the homepage
-    if (pathname !== "/") {
+    if (pathname === "/") {
+      setScrollActiveSection("home");
+    } else {
       setScrollActiveSection(null);
-      return;
     }
-
-    // Set default to "home" when entering the homepage
-    setScrollActiveSection("home");
-
-    // Small delay to let the page render before observing
-    const timeoutId = setTimeout(() => {
-      const sectionIds = links.map((link) => link.sectionId);
-      const sections = sectionIds.map((id) => document.getElementById(id));
-
-      const observerOptions = {
-        root: null,
-        rootMargin: "-20% 0px -70% 0px", // Trigger when section is in middle of viewport
-        threshold: 0,
-      };
-
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const id = entry.target.id;
-            setScrollActiveSection(id);
-          }
-        });
-      }, observerOptions);
-
-      sections.forEach((section) => {
-        if (section) observer.observe(section);
-      });
-
-      // Store observer reference for cleanup
-      (window as any).__navObserver = observer;
-      (window as any).__navSections = sections;
-    }, 100);
-
-    return () => {
-      clearTimeout(timeoutId);
-      const observer = (window as any).__navObserver;
-      const sections = (window as any).__navSections;
-      if (observer && sections) {
-        sections.forEach((section: Element | null) => {
-          if (section) observer.unobserve(section);
-        });
-      }
-    };
   }, [pathname]);
 
   const handleAccentChange = (accent: string) => {
@@ -250,25 +211,6 @@ export function Nav() {
     }
   };
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    setShowSearchResults(query.length > 0);
-  };
-
-  const executeSearch = (windowId: string) => {
-    const event = new CustomEvent("open-os-window", {
-      detail: { windowId }
-    });
-    window.dispatchEvent(event);
-    setSearchQuery("");
-    setShowSearchResults(false);
-    
-    // If not on homepage, go home first since Desktop is there
-    if (pathname !== "/") {
-      router.push("/");
-    }
-  };
-
   if (!mounted) return null;
 
   return (
@@ -284,7 +226,7 @@ export function Nav() {
         }`}
       >
         <nav className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="flex items-center justify-between h-20">
+          <div className="flex items-center justify-between gap-2 h-20 min-w-0">
             {/* Logo */}
             <motion.a
               href="/"
@@ -304,7 +246,7 @@ export function Nav() {
             </motion.a>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-6 relative px-6 py-2 bg-foreground/5 rounded-2xl border border-foreground/10 mx-4">
+            <div className="hidden md:flex flex-1 min-w-0 items-center gap-4 relative px-4 py-2 bg-foreground/5 rounded-2xl border border-foreground/10 mx-2 lg:mx-4">
               <div className="flex items-center gap-1">
                 {links.map((link) => (
                   <NavLink
@@ -315,80 +257,10 @@ export function Nav() {
                   />
                 ))}
               </div>
-              
-              <div className="w-px h-6 bg-foreground/10 mx-2" />
-              
-              {/* Navbar Search */}
-              <div className="relative group">
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-os-window rounded-xl border border-black/10 dark:border-white/10 focus-within:border-accent/30 transition-all w-48 lg:w-64">
-                  <svg className="w-4 h-4 text-foreground/40 group-focus-within:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => handleSearch(e.target.value)}
-                    placeholder={t("nav.searchPlaceholder") || "Search portfolio..."}
-                    className="w-full bg-transparent border-none outline-none text-xs text-foreground placeholder:text-foreground/30"
-                  />
-                </div>
-                
-                {/* Search Results Dropdown */}
-                <AnimatePresence>
-                  {showSearchResults && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="absolute top-full left-0 right-0 mt-2 bg-os-window border border-black/10 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden z-50 p-2"
-                    >
-                      {(() => {
-                        const query = searchQuery.toLowerCase();
-                        const results = [
-                          { id: "about", label: "About Me", icon: "👤", keywords: ["skills", "bio", "education", "tech", "react", "nextjs", "python"] },
-                          { id: "projects", label: "Projects", icon: "🚀", keywords: ["work", "apps", "code", "portfolio", "lumaya", "safety", "test"] },
-                          { id: "experience", label: "Experience", icon: "💼", keywords: ["jobs", "history", "hashlogics", "techling", "career"] },
-                          { id: "contact", label: "Contact", icon: "✉️", keywords: ["email", "hire", "talk", "social", "phone", "location"] },
-                        ];
-
-                        // Filter results by checking if query matches label, keywords or if we should open a specific window based on more data
-                        const filtered = results.filter(item => 
-                          item.label.toLowerCase().includes(query) ||
-                          item.keywords.some(k => k.includes(query))
-                        );
-
-                        if (filtered.length === 0) {
-                          return <p className="p-4 text-xs text-foreground/40 text-center">No matches found</p>;
-                        }
-
-                        return filtered.map(result => (
-                          <button
-                            key={result.id}
-                            onClick={() => executeSearch(result.id)}
-                            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent/10 text-foreground text-sm transition-colors group"
-                          >
-                            <span className="text-lg">{result.icon}</span>
-                            <div className="text-left">
-                              <p className="font-medium group-hover:text-accent transition-colors">{result.label}</p>
-                              <p className="text-[10px] text-foreground/40 italic">Open in OS Window</p>
-                            </div>
-                          </button>
-                        ));
-                      })()}
-                      
-                      {searchQuery.length > 0 && (
-                        <div className="p-2 border-t border-foreground/5 mt-1">
-                          <p className="text-[10px] text-foreground/30 text-center">Searching through portfolio.json...</p>
-                        </div>
-                      )}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
             </div>
 
-            {/* CTA Button & Theme Controls */}
-            <div className="hidden md:flex items-center gap-3">
+            {/* CTA Button & Theme Controls — never shrink (prevents crushed buttons) */}
+            <div className="hidden md:flex items-center gap-2 shrink-0 flex-nowrap">
               {/* Accent Switcher */}
               <div className="relative">
                 <motion.button
@@ -443,6 +315,8 @@ export function Nav() {
                 </AnimatePresence>
               </div>
 
+              <ViewModeToggle variant="nav" />
+
               {/* Language Switcher */}
               <LanguageSwitcher />
 
@@ -468,18 +342,28 @@ export function Nav() {
               </motion.button>
 
 
-              {/* Resume/CTA Button */}
               <motion.a
-                href="/resume.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
+                href={hireMeHref}
+                style={portfolioCtaStyle.default}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="group relative px-6 py-2.5 bg-accent rounded-lg text-white font-semibold text-sm overflow-hidden"
+                className="shrink-0 rounded-lg border-2 border-accent/50 bg-accent/10 text-sm text-foreground transition-all hover:border-accent/60 hover:bg-accent/15"
+              >
+                {t("hero.hireMe")}
+              </motion.a>
+
+              {/* Resume/CTA Button */}
+              <motion.a
+                href={RESUME_PATH}
+                download={RESUME_FILENAME}
+                style={portfolioCtaStyle.default}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="shrink-0 group relative rounded-lg bg-accent text-sm text-white overflow-hidden"
               >
                 <span className="relative z-10 flex items-center gap-2">
                   {t("nav.resume")}
-                  <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-4 w-4 shrink-0 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </span>
@@ -622,17 +506,31 @@ export function Nav() {
 
                     </div>
 
+                    <ViewModeToggle variant="nav" className="w-full" />
+
+                    <motion.a
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.45 }}
+                      href={hireMeHref}
+                      onClick={() => setMobileMenuOpen(false)}
+                      style={portfolioCtaStyle.block}
+                      className="rounded-xl border-2 border-accent/50 bg-accent/10 text-center text-foreground transition-all hover:border-accent/60 hover:bg-accent/15"
+                    >
+                      {t("hero.hireMe")}
+                    </motion.a>
+
                     <motion.a
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 }}
-                      href="/resume.pdf"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      href={RESUME_PATH}
+                      download={RESUME_FILENAME}
                       onClick={() => setMobileMenuOpen(false)}
-                      className="block w-full px-6 py-4 bg-accent rounded-xl text-white font-semibold text-center hover:shadow-lg hover:shadow-accent/50 transition-all duration-300"
+                      style={portfolioCtaStyle.block}
+                      className="rounded-xl bg-accent text-center text-white hover:shadow-lg hover:shadow-accent/50 transition-all duration-300"
                     >
-                      Download Resume
+                      {t("nav.downloadResume")}
                     </motion.a>
                   </div>
                 </div>

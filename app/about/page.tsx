@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { AboutContent } from "@/components/about-content";
 
 export const metadata: Metadata = {
-  title: "About | Ali Burhan - Full Stack Developer & Architect",
+  title: "About | Ali Burhan - Full Stack Engineer",
   description:
-    "Learn about Ali Burhan, a Full Stack Developer & Architect from Lahore, Pakistan with 3+ years experience in Next.js, React, Python, AWS & AI. UET Lahore CS graduate building scalable cloud-native solutions.",
+    "Learn about Ali Burhan, a Full Stack Engineer from Lahore, Pakistan with 3+ years experience in Next.js, React, Python, AWS & AI. UET Lahore CS graduate building scalable cloud-native solutions.",
   keywords: [
     "Ali Burhan",
     "About Ali Burhan",
@@ -14,16 +14,16 @@ export const metadata: Metadata = {
     "AWS Developer Pakistan",
     "AI Engineer Pakistan",
     "UET Lahore",
-    "Full Stack Architect",
+    "Full Stack Engineer",
   ],
   authors: [{ name: "Ali Burhan", url: "https://aliburhan.com" }],
   alternates: {
     canonical: "https://aliburhan.com/about",
   },
   openGraph: {
-    title: "About Ali Burhan - Full Stack Developer & Architect",
+    title: "About Ali Burhan - Full Stack Engineer",
     description:
-      "Learn about Ali Burhan, a Full Stack Developer & Architect from Lahore, Pakistan with 3+ years experience in Next.js, React, Python, AWS & AI.",
+      "Learn about Ali Burhan, a Full Stack Engineer from Lahore, Pakistan with 3+ years experience in Next.js, React, Python, AWS & AI.",
     url: "https://aliburhan.com/about",
     type: "profile",
     images: ["/og-image.png"],
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "About Ali Burhan - Full Stack Developer",
     description:
-      "Learn about Ali Burhan, a Full Stack Developer & Architect from Lahore, Pakistan with 3+ years experience in Next.js, React, Python, AWS & AI.",
+      "Learn about Ali Burhan, a Full Stack Engineer from Lahore, Pakistan with 3+ years experience in Next.js, React, Python, AWS & AI.",
     images: ["/og-image.png"],
   },
 };
@@ -46,8 +46,8 @@ export default function AboutPage() {
     mainEntity: {
       "@type": "Person",
       name: "Ali Burhan",
-      jobTitle: "Full Stack Developer & Architect",
-      description: "Full Stack Developer & Architect with 3+ years experience in Next.js, React, Python, AWS & AI",
+      jobTitle: "Full Stack Engineer",
+      description: "Full Stack Engineer with 3+ years experience in Next.js, React, Python, AWS & AI",
       url: "https://aliburhan.com",
       sameAs: [
         "https://github.com/Ali-Burhan",

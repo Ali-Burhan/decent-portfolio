@@ -7,19 +7,38 @@ import { Section } from "@/components/section";
 import { motion } from "framer-motion";
 import portfolioData from "../data/portfolio.json";
 import { useI18n } from "@/lib/i18n";
-import { ProjectCardSkeleton, ContactFormSkeleton } from "@/components/loading-skeleton";
+import { ProjectCard } from "@/components/project-card";
+import { FeaturedProjectsRow } from "@/components/featured-projects-row";
+import { getProjectMedia } from "@/lib/project-media";
+import { ContactFormSkeleton } from "@/components/loading-skeleton";
+import { SiteFooter } from "@/components/site-footer";
 
-const ProjectCard = lazy(() => import("@/components/project-card").then(mod => ({ default: mod.ProjectCard })));
 const ContactForm = lazy(() => import("@/components/contact-form").then(mod => ({ default: mod.ContactForm })));
 
 export function HomeContent() {
   const { personalInfo, experience, freelanceProjects, skills, socialLinks } = portfolioData;
   const { t } = useI18n();
 
-  const allProjects = useMemo(() => [
-    ...experience.flatMap(exp => exp.projects.map(p => ({ ...p, type: "Work" }))),
-    ...freelanceProjects.map(p => ({ ...p, type: "Freelance" }))
-  ], [experience, freelanceProjects]);
+  const allProjects = useMemo(
+    () => [
+      ...experience.flatMap((exp) =>
+        exp.projects.map((p) => ({
+          ...p,
+          type: "Work" as const,
+          slug: "slug" in p ? (p as { slug?: string }).slug : undefined,
+          liveUrl: "url" in p && p.url ? (p as { url?: string }).url : undefined,
+        }))
+      ),
+      ...freelanceProjects.map((p) => ({
+        ...p,
+        type: "Freelance" as const,
+        slug: "slug" in p ? (p as { slug?: string }).slug : undefined,
+        liveUrl:
+          "url" in p && p.url ? (p as { url?: string | null }).url ?? undefined : undefined,
+      })),
+    ],
+    [experience, freelanceProjects]
+  );
 
   return (
     <div className="relative min-h-screen bg-background text-foreground selection:bg-accent/30">
@@ -119,7 +138,7 @@ export function HomeContent() {
               <div className="relative aspect-square w-full max-w-[380px] mx-auto">
                 <div className="relative w-full h-full rounded-2xl overflow-hidden border-2 border-foreground/10 bg-foreground/5">
                   <Image
-                    src="/ali pic.png"
+                    src="/ali-burhan.jpg"
                     alt={personalInfo.name}
                     width={380}
                     height={380}
@@ -204,11 +223,35 @@ export function HomeContent() {
                       </div>
 
                       <div className="space-y-4">
-                        {job.projects.map((project, pIndex) => (
+                        {job.projects.map((project, pIndex) => {
+                          const slug = "slug" in project ? (project as { slug?: string }).slug : undefined;
+                          const media = getProjectMedia(slug);
+
+                          return (
                           <div key={pIndex} className="space-y-2">
+                            {media && slug && (
+                              <a
+                                href={`/projects/${slug}`}
+                                className="block overflow-hidden rounded-lg border border-foreground/10"
+                              >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={media.cover}
+                                  alt={media.alt}
+                                  loading="lazy"
+                                  decoding="async"
+                                  className="block w-full h-auto"
+                                />
+                              </a>
+                            )}
                             <h4 className="font-medium text-foreground/90 flex items-center gap-2">
                               <span className="w-1.5 h-1.5 rounded-full bg-accent" />
                               {project.name}
+                              {slug && (
+                                <a href={`/projects/${slug}`} className="text-xs text-accent hover:underline ml-auto">
+                                  Case study →
+                                </a>
+                              )}
                             </h4>
                             <ul className="space-y-1 pl-4">
                               {project.achievements.slice(0, 2).map((point, i) => (
@@ -231,7 +274,8 @@ export function HomeContent() {
                               </div>
                             )}
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   </motion.div>
@@ -265,11 +309,11 @@ export function HomeContent() {
               </a>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <FeaturedProjectsRow variant="site" />
+
+            <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {allProjects.slice(0, 6).map((project, index) => (
-                <Suspense key={project.name + index} fallback={<ProjectCardSkeleton />}>
-                  <ProjectCard project={project} index={index} />
-                </Suspense>
+                <ProjectCard key={`${project.name}-${index}`} project={project} index={index} />
               ))}
             </div>
           </motion.div>
@@ -347,6 +391,7 @@ export function HomeContent() {
           </motion.div>
         </Section>
       </main>
+      <SiteFooter />
     </div>
   );
 }

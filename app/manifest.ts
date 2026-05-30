@@ -2,10 +2,10 @@ import { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Ali Burhan - Full Stack Developer & Architect',
+    name: 'Ali Burhan - Full Stack Engineer',
     short_name: 'Ali Burhan',
     description:
-      'Full Stack Developer & Architect specializing in Next.js, React, Python, AWS & AI. Building scalable cloud-native solutions.',
+      'Full Stack Engineer specializing in Next.js, React, Python, AWS & AI. Building scalable cloud-native solutions.',
     start_url: '/',
     display: 'standalone',
     background_color: '#ffffff',
@@ -13,26 +13,18 @@ export default function manifest(): MetadataRoute.Manifest {
     orientation: 'portrait-primary',
     icons: [
       {
-        src: '/icon-192.png',
-        sizes: '192x192',
+        src: '/icon',
+        sizes: '32x32',
         type: 'image/png',
         purpose: 'any',
       },
       {
-        src: '/icon-512.png',
-        sizes: '512x512',
+        src: '/apple-icon',
+        sizes: '180x180',
         type: 'image/png',
         purpose: 'any',
       },
     ],
     categories: ['technology', 'portfolio', 'developer', 'programming'],
-    screenshots: [
-      {
-        src: '/og-image.png',
-        sizes: '1200x630',
-        type: 'image/png',
-        label: 'Ali Burhan Portfolio',
-      },
-    ],
   }
 }

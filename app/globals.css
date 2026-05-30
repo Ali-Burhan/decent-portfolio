@@ -84,41 +84,71 @@
   --accent: var(--electric-cyan);
 }
 
-/* OS Desktop specific variables */
+/* OS Desktop — cohesive tokens (windows use os-* only, not site foreground) */
 :root {
-  --os-taskbar: #ffffff;
-  --os-taskbar-border: rgba(0, 0, 0, 0.1);
+  --os-accent: var(--accent);
+  --os-accent-muted: color-mix(in srgb, var(--accent) 14%, transparent);
+  --os-taskbar: rgba(248, 250, 252, 0.88);
+  --os-taskbar-border: rgba(15, 23, 42, 0.08);
   --os-window: #ffffff;
-  --os-window-header: #f3f3f3;
-  --os-window-text: #171717;
-  --os-window-border: rgba(0, 0, 0, 0.1);
-  --os-icon-hover: rgba(0, 0, 0, 0.05);
-  --os-cyan: #66d9ed;
-  --os-desktop-bg: #e0f2fe;
-  --os-start-menu-bg: #ffffff;
-  --os-popover-bg: #ffffff;
-  --os-text-primary: #171717;
-  --os-text-secondary: #4a4a4a;
-  --os-window-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  --os-window-header: rgba(248, 250, 252, 0.95);
+  --os-content-bg: #f1f5f9;
+  --os-surface: #ffffff;
+  --os-surface-muted: #f8fafc;
+  --os-surface-elevated: #ffffff;
+  --os-border: rgba(15, 23, 42, 0.1);
+  --os-window-text: #0f172a;
+  --os-window-border: rgba(15, 23, 42, 0.12);
+  --os-icon-hover: rgba(15, 23, 42, 0.06);
+  --os-cyan: var(--accent);
+  --os-desktop-bg: #dbeafe;
+  --os-start-menu-bg: rgba(255, 255, 255, 0.96);
+  --os-popover-bg: rgba(255, 255, 255, 0.96);
+  --os-text-primary: #0f172a;
+  --os-text-secondary: #475569;
+  --os-text-muted: #64748b;
+  --os-window-shadow:
+    0 0 0 1px rgba(15, 23, 42, 0.06),
+    0 24px 48px -12px rgba(15, 23, 42, 0.18),
+    0 8px 16px -8px rgba(15, 23, 42, 0.08);
+  --os-card-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --os-card-shadow-hover: 0 12px 24px -8px rgba(15, 23, 42, 0.12);
+  --os-glass-border: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.15) 100%);
+  --os-accent-glow: color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
 .dark {
   --background: #0a0a0a;
   --foreground: #ededed;
-  --os-taskbar: #141414;
-  --os-taskbar-border: rgba(255, 255, 255, 0.1);
-  --os-window: #1e1e1e;
-  --os-window-header: #2d2d2d;
-  --os-window-text: #ffffff;
+  --os-accent: var(--accent);
+  --os-accent-muted: color-mix(in srgb, var(--accent) 18%, transparent);
+  --os-taskbar: rgba(15, 20, 28, 0.92);
+  --os-taskbar-border: rgba(255, 255, 255, 0.08);
+  --os-window: #141a24;
+  --os-window-header: rgba(20, 26, 36, 0.98);
+  --os-content-bg: #0c1018;
+  --os-surface: #161d28;
+  --os-surface-muted: #1a222e;
+  --os-surface-elevated: #1c2533;
+  --os-border: rgba(255, 255, 255, 0.08);
+  --os-window-text: #f1f5f9;
   --os-window-border: rgba(255, 255, 255, 0.1);
-  --os-icon-hover: rgba(255, 255, 255, 0.1);
-  --os-cyan: #66d9ed;
-  --os-desktop-bg: #0c1929;
-  --os-start-menu-bg: #1c1c1c;
-  --os-popover-bg: #1c1c1c;
-  --os-text-primary: #ffffff;
-  --os-text-secondary: #a1a1aa;
-  --os-window-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  --os-icon-hover: rgba(255, 255, 255, 0.08);
+  --os-cyan: var(--accent);
+  --os-desktop-bg: #070b12;
+  --os-start-menu-bg: rgba(20, 26, 36, 0.96);
+  --os-popover-bg: rgba(20, 26, 36, 0.96);
+  --os-text-primary: #f1f5f9;
+  --os-text-secondary: #94a3b8;
+  --os-text-muted: #64748b;
+  --os-window-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 32px 64px -16px rgba(0, 0, 0, 0.65),
+    0 0 80px -20px color-mix(in srgb, var(--accent) 25%, transparent);
+  --os-card-shadow: 0 1px 0 rgba(255, 255, 255, 0.04);
+  --os-card-shadow-hover: 0 16px 32px -12px rgba(0, 0, 0, 0.5);
+  --os-glass-border: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 100%);
+  --os-accent-glow: color-mix(in srgb, var(--accent) 30%, transparent);
   --visionary: #e95454;
   --depth-seeker: #0099a0;
   --subtle-luxe: #9e74e5;
@@ -164,6 +194,7 @@
   --color-os-text-primary: var(--os-text-primary);
   --color-os-text-secondary: var(--os-text-secondary);
   --color-os-taskbar: var(--os-taskbar);
+  --color-os-cyan: var(--os-cyan);
   --font-sans: var(--font-inter);
 }
 
@@ -222,4 +253,166 @@ body {
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Glassmorphism utilities */
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.dark .glass-card {
+  background: rgba(30, 30, 30, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.15);
+}
+
+.glass-window {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.dark .glass-window {
+  background: rgba(30, 30, 30, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* OS window interior */
+.os-window-content {
+  background: var(--os-content-bg);
+  color: var(--os-text-primary);
+}
+
+.os-card {
+  background: var(--os-surface);
+  border: 1px solid var(--os-border);
+  box-shadow: var(--os-card-shadow);
+  color: var(--os-text-primary);
+}
+
+.os-card-hover:hover {
+  border-color: color-mix(in srgb, var(--os-accent) 35%, var(--os-border));
+  box-shadow: var(--os-card-shadow-hover);
+}
+
+.os-input {
+  background: var(--os-surface-muted);
+  border: 1px solid var(--os-border);
+  color: var(--os-text-primary);
+}
+
+.os-input::placeholder {
+  color: var(--os-text-muted);
+}
+
+.os-input:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--os-accent) 55%, var(--os-border));
+  box-shadow: 0 0 0 3px var(--os-accent-muted);
+}
+
+.os-btn-primary {
+  background: var(--os-accent);
+  color: #fff;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--os-accent) 40%, transparent);
+}
+
+.os-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
+.os-btn-secondary {
+  background: var(--os-surface-muted);
+  border: 1px solid var(--os-border);
+  color: var(--os-text-primary);
+}
+
+.os-btn-secondary:hover:not(:disabled) {
+  background: var(--os-surface-elevated);
+}
+
+/* Enhanced scrollbar styling */
+.os-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.os-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.os-scrollbar::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--os-text-muted) 40%, transparent);
+  border-radius: 4px;
+}
+
+.os-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--os-text-muted) 65%, transparent);
+}
+
+/* Recruiter View CTA — high visibility on desktop home */
+@keyframes recruiter-cta-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(252, 211, 77, 0.6),
+      0 4px 14px rgba(245, 158, 11, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 0 10px rgba(252, 211, 77, 0),
+      0 6px 22px rgba(251, 191, 36, 0.55);
+  }
+}
+
+.dark .recruiter-view-cta {
+  animation: recruiter-cta-glow-dark 2s ease-in-out infinite;
+}
+
+@keyframes recruiter-cta-glow-dark {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(253, 224, 71, 0.5),
+      0 4px 16px rgba(251, 191, 36, 0.45);
+  }
+  50% {
+    box-shadow:
+      0 0 0 10px rgba(253, 224, 71, 0),
+      0 6px 24px rgba(252, 211, 77, 0.5);
+  }
+}
+
+@keyframes recruiter-cta-ring-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  70% {
+    transform: scale(1.12);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.12);
+    opacity: 0;
+  }
+}
+
+.recruiter-view-cta {
+  animation: recruiter-cta-glow 2s ease-in-out infinite;
+}
+
+.recruiter-view-cta-ring {
+  animation: recruiter-cta-ring-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recruiter-view-cta,
+  .recruiter-view-cta-ring {
+    animation: none;
+  }
 }

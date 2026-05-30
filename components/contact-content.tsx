@@ -7,6 +7,7 @@ import { ContactForm } from "@/components/contact-form";
 import portfolioData from "@/data/portfolio.json";
 import { useI18n } from "@/lib/i18n";
 import { Nav } from "@/components/nav";
+import { SiteFooter } from "@/components/site-footer";
 
 export function ContactContent() {
   const { personalInfo, socialLinks } = portfolioData;
@@ -148,6 +149,7 @@ export function ContactContent() {
           </div>
         </Section>
       </main>
+      <SiteFooter />
     </div>
   );
 }

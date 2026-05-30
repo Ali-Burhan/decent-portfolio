@@ -1,14 +1,75 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
+const RESEND_DEFAULT_FROM = "Portfolio Contact <onboarding@resend.dev>";
+
+/** Resend only allows sending from verified domains (not @gmail.com, etc.). */
+const PUBLIC_EMAIL_DOMAINS = new Set([
+  "gmail.com",
+  "googlemail.com",
+  "yahoo.com",
+  "hotmail.com",
+  "outlook.com",
+  "live.com",
+  "icloud.com",
+  "proton.me",
+  "protonmail.com",
+]);
+
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function extractEmailAddress(from: string): string | null {
+  const bracketed = from.match(/<([^>]+)>/);
+  const raw = (bracketed?.[1] ?? from).trim();
+  return raw.includes("@") ? raw : null;
+}
+
+function resolveFromAddress(): string {
+  const configured = process.env.RESEND_FROM_EMAIL?.trim();
+  if (!configured) return RESEND_DEFAULT_FROM;
+
+  const email = extractEmailAddress(configured);
+  const domain = email?.split("@")[1]?.toLowerCase();
+
+  if (!domain || PUBLIC_EMAIL_DOMAINS.has(domain)) {
+    console.warn(
+      `RESEND_FROM_EMAIL "${configured}" is not allowed. Using ${RESEND_DEFAULT_FROM}. ` +
+        "Verify your own domain at https://resend.com/domains to use a custom From address."
+    );
+    return RESEND_DEFAULT_FROM;
+  }
+
+  return configured;
+}
+
 export async function POST(request: NextRequest) {
-  // Initialize Resend with API key (lazy initialization to avoid build errors)
-  const resend = new Resend(process.env.RESEND_API_KEY || "");
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+
+  if (!apiKey) {
+    console.error(
+      "Contact form: RESEND_API_KEY is not set. Add it to .env.local (see .env.example)."
+    );
+    return NextResponse.json(
+      {
+        error: "Email service is not configured",
+        code: "MISSING_RESEND_API_KEY",
+      },
+      { status: 503 }
+    );
+  }
+
+  const resend = new Resend(apiKey);
+
   try {
     const body = await request.json();
     const { name, email, subject, message } = body;
 
-    // Validation
     if (!name || !email || !message) {
       return NextResponse.json(
         { error: "Missing required fields" },
@@ -16,7 +77,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
@@ -25,9 +85,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Send email using Resend
-    const emailSubject = subject 
-      ? `[Portfolio Contact] ${subject}` 
+    const safeName = escapeHtml(String(name));
+    const safeEmail = escapeHtml(String(email));
+    const safeSubject = subject ? escapeHtml(String(subject)) : "";
+    const safeMessage = escapeHtml(String(message));
+
+    const emailSubject = safeSubject
+      ? `[Portfolio Contact] ${safeSubject}`
       : "[Portfolio Contact] New Message";
 
     const emailHtml = `
@@ -55,14 +119,8 @@ export async function POST(request: NextRequest) {
               padding: 30px;
               border-radius: 0 0 10px 10px;
             }
-            .field {
-              margin-bottom: 20px;
-            }
-            .label {
-              font-weight: 600;
-              color: #667eea;
-              margin-bottom: 5px;
-            }
+            .field { margin-bottom: 20px; }
+            .label { font-weight: 600; color: #667eea; margin-bottom: 5px; }
             .value {
               background: white;
               padding: 12px;
@@ -89,35 +147,34 @@ export async function POST(request: NextRequest) {
         </head>
         <body>
           <div class="header">
-            <h1 style="margin: 0;">📬 New Portfolio Contact</h1>
+            <h1 style="margin: 0;">New Portfolio Contact</h1>
           </div>
           <div class="content">
             <div class="field">
               <div class="label">From:</div>
-              <div class="value">${name}</div>
+              <div class="value">${safeName}</div>
             </div>
-            
             <div class="field">
               <div class="label">Email:</div>
               <div class="value">
-                <a href="mailto:${email}" style="color: #667eea; text-decoration: none;">
-                  ${email}
+                <a href="mailto:${safeEmail}" style="color: #667eea; text-decoration: none;">
+                  ${safeEmail}
                 </a>
               </div>
             </div>
-            
-            ${subject ? `
+            ${
+              safeSubject
+                ? `
             <div class="field">
               <div class="label">Subject:</div>
-              <div class="value">${subject}</div>
-            </div>
-            ` : ''}
-            
+              <div class="value">${safeSubject}</div>
+            </div>`
+                : ""
+            }
             <div class="field">
               <div class="label">Message:</div>
-              <div class="message-box">${message}</div>
+              <div class="message-box">${safeMessage}</div>
             </div>
-            
             <div class="footer">
               Sent from your portfolio contact form at ${new Date().toLocaleString()}
             </div>
@@ -126,18 +183,20 @@ export async function POST(request: NextRequest) {
       </html>
     `;
 
+    const fromAddress = resolveFromAddress();
+
     const { data, error } = await resend.emails.send({
-      from: "Portfolio Contact <onboarding@resend.dev>",
+      from: fromAddress,
       to: [process.env.CONTACT_EMAIL || "aliburhan.dev.ai@gmail.com"],
       subject: emailSubject,
       html: emailHtml,
-      replyTo: email,
+      replyTo: String(email),
     });
 
     if (error) {
       console.error("Resend error:", error);
       return NextResponse.json(
-        { error: "Failed to send email" },
+        { error: "Failed to send email", details: error.message },
         { status: 500 }
       );
     }

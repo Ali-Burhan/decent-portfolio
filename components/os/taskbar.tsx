@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, useMemo, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThemeToggle } from "@/components/theme-toggle";
 import portfolioData from "@/data/portfolio.json";
+import { RESUME_FILENAME, RESUME_PATH } from "@/lib/site";
 import { type WindowId } from "./desktop";
 
 interface NewsItem {
@@ -153,7 +154,7 @@ export const Taskbar = memo(function Taskbar({
   }, []);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 h-12 z-50">
+    <div className="fixed bottom-0 left-0 right-0 z-[120] h-12">
       {/* Taskbar Background - Windows 11 style with blur */}
       <div
         className="absolute inset-0 transition-colors duration-300"
@@ -187,6 +188,7 @@ export const Taskbar = memo(function Taskbar({
           <button
             onClick={onStartClick}
             className="w-10 h-10 rounded-md flex items-center justify-center hover:bg-foreground/10 hover-scale-108 active-scale-92 transition-all duration-120"
+            aria-label="Start menu"
             title="Start"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -247,6 +249,19 @@ export const Taskbar = memo(function Taskbar({
 
         {/* Right Section - System Tray */}
         <div className="flex-1 flex items-center justify-end gap-1">
+          <a
+            href={RESUME_PATH}
+            download={RESUME_FILENAME}
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] md:text-xs font-semibold text-os-text-primary hover:bg-foreground/10 transition-colors"
+            aria-label="Download resume PDF"
+            title="Download resume"
+          >
+            <svg className="w-3.5 h-3.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Resume
+          </a>
+
           {/* Theme Toggle */}
           <ThemeToggle />
 

@@ -42,7 +42,7 @@ export default function ExperiencePage() {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: "Ali Burhan - Professional Experience",
-    description: "Professional experience of Ali Burhan as Full Stack Developer & Architect",
+    description: "Professional experience of Ali Burhan as Full Stack Engineer",
     url: "https://aliburhan.com/experience",
   };
 
